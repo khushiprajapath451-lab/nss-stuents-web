@@ -12,7 +12,7 @@ import {
 import { Menu, X, LogOut, User, Home, LayoutDashboard } from 'lucide-react';
 
 interface HeaderProps {
-  user?: { name: string; email: string; avatar: string } | null;
+  user?: { name: string; rollNumber: string; avatar: string } | null;
   onLogout?: () => void;
 }
 
@@ -34,11 +34,11 @@ export function Header({ user, onLogout }: HeaderProps) {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
-            <span className="text-lg font-bold text-primary-foreground">V</span>
+            <span className="text-lg font-bold text-primary-foreground">N</span>
           </div>
           <div className="hidden sm:block">
-            <h1 className="font-display text-lg font-bold text-foreground">Vardhaman NSS</h1>
-            <p className="text-xs text-muted-foreground">National Service Scheme</p>
+            <h1 className="font-display text-lg font-bold text-foreground">NSS Portal</h1>
+            <p className="text-xs text-muted-foreground">Not Me But You</p>
           </div>
         </Link>
 
@@ -80,7 +80,7 @@ export function Header({ user, onLogout }: HeaderProps) {
                   </Avatar>
                   <div className="flex flex-col">
                     <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="text-xs text-muted-foreground">{user.rollNumber}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
