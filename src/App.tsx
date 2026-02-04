@@ -9,7 +9,7 @@ import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
-import { User, users } from '@/lib/mockData';
+import { User } from '@/lib/mockData';
 
 const queryClient = new QueryClient();
 
@@ -31,7 +31,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Header
-            user={currentUser ? { name: currentUser.name, email: currentUser.email, avatar: currentUser.avatar } : null}
+            user={currentUser ? { name: currentUser.name, rollNumber: currentUser.rollNumber, avatar: currentUser.avatar } : null}
             onLogout={handleLogout}
           />
           <Routes>

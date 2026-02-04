@@ -1,8 +1,8 @@
-// Mock data for Vardhaman NSS Portal
+// Mock data for NSS Portal
 
 export interface User {
   id: string;
-  email: string;
+  rollNumber: string;
   name: string;
   role: 'volunteer' | 'head';
   avatar: string;
@@ -54,55 +54,55 @@ export interface Certificate {
   type: 'participation' | 'excellence' | 'leadership';
 }
 
-// Seeded Users
+// Seeded Users with roll numbers
 export const users: User[] = [
   {
     id: '1',
-    email: 'khushi@vardhaman.edu',
+    rollNumber: '24881A05Y3',
     name: 'Khushi Sharma',
     role: 'volunteer',
     avatar: 'KS',
-    totalHours: 45,
-    eventsAttended: 12,
-    badges: ['blood_hero', 'eco_warrior', 'first_responder'],
+    totalHours: 0,
+    eventsAttended: 0,
+    badges: [],
     isInactive: false,
   },
   {
     id: '2',
-    email: 'rahul@vardhaman.edu',
+    rollNumber: '24881A05AG',
     name: 'Rahul Verma',
     role: 'volunteer',
     avatar: 'RV',
-    totalHours: 38,
-    eventsAttended: 10,
-    badges: ['blood_hero', 'community_star'],
+    totalHours: 0,
+    eventsAttended: 0,
+    badges: [],
     isInactive: false,
   },
   {
     id: '3',
-    email: 'priya@vardhaman.edu',
+    rollNumber: '24881A05AP',
     name: 'Priya Reddy',
     role: 'volunteer',
     avatar: 'PR',
-    totalHours: 52,
-    eventsAttended: 15,
-    badges: ['blood_hero', 'eco_warrior', 'mentor'],
+    totalHours: 0,
+    eventsAttended: 0,
+    badges: [],
     isInactive: false,
   },
   {
     id: '4',
-    email: 'amit@vardhaman.edu',
+    rollNumber: '24881A05Z4',
     name: 'Amit Kumar',
     role: 'volunteer',
     avatar: 'AK',
-    totalHours: 8,
-    eventsAttended: 2,
+    totalHours: 0,
+    eventsAttended: 0,
     badges: [],
-    isInactive: true,
+    isInactive: false,
   },
   {
     id: '5',
-    email: 'head@vardhaman.edu',
+    rollNumber: 'NSS_HEAD',
     name: 'Dr. Suresh Nair',
     role: 'head',
     avatar: 'SN',
@@ -213,7 +213,7 @@ export const eventProposals: EventProposal[] = [
 export const urgentPosts: UrgentPost[] = [
   {
     id: '1',
-    title: '🩸 URGENT: O- Blood Needed',
+    title: '🩸 Blood Donation - URGENT!',
     description: 'Patient at City Hospital requires O- blood urgently. Contact immediately if you can donate.',
     urgencyLevel: 'critical',
     postedAt: '2024-02-04T10:30:00',
@@ -222,12 +222,12 @@ export const urgentPosts: UrgentPost[] = [
   },
   {
     id: '2',
-    title: '🧬 Stem Cell Donors Needed',
+    title: '🧬 Swab Donation Feb 10',
     description: 'Register for stem cell donation drive this weekend. Save lives by joining the donor registry.',
     urgencyLevel: 'high',
     postedAt: '2024-02-04T08:00:00',
     category: 'Swab Donation',
-    contact: 'nss@vardhaman.edu',
+    contact: 'nss@college.edu',
   },
   {
     id: '3',
@@ -236,34 +236,12 @@ export const urgentPosts: UrgentPost[] = [
     urgencyLevel: 'medium',
     postedAt: '2024-02-03T14:00:00',
     category: 'Donation',
-    contact: 'library@vardhaman.edu',
+    contact: 'library@college.edu',
   },
 ];
 
-// Certificates for current user
-export const certificates: Certificate[] = [
-  {
-    id: '1',
-    eventName: 'Blood Donation Camp 2024',
-    date: '2024-01-15',
-    hours: 4,
-    type: 'participation',
-  },
-  {
-    id: '2',
-    eventName: 'Campus Cleanup Drive',
-    date: '2024-01-20',
-    hours: 3,
-    type: 'participation',
-  },
-  {
-    id: '3',
-    eventName: 'Health Awareness Workshop',
-    date: '2024-02-10',
-    hours: 3,
-    type: 'excellence',
-  },
-];
+// Certificates for current user - empty by default for new volunteers
+export const certificates: Certificate[] = [];
 
 // Badge definitions
 export const badgeInfo: Record<string, { name: string; icon: string; description: string }> = {
