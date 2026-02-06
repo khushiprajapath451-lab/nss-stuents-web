@@ -19,7 +19,10 @@ interface MyRecordProps {
 }
 
 export function MyRecord({ user }: MyRecordProps) {
-  const userEvents = events.filter((e) => e.status === 'completed').slice(0, 5);
+  // Only show events the user actually attended (none for new volunteers)
+  const userEvents = user.eventsAttended > 0
+    ? events.filter((e) => e.status === 'completed').slice(0, user.eventsAttended)
+    : [];
   const progressToNextBadge = Math.min((user.totalHours / 50) * 100, 100);
 
   return (
