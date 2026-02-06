@@ -3,7 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MyRecord } from '@/components/MyRecord';
 import { ProposeEvent } from '@/components/ProposeEvent';
 import { CalendarLeaders } from '@/components/CalendarLeaders';
-import { User as UserIcon, Lightbulb, Calendar, Crown } from 'lucide-react';
+import { AdminPanel } from '@/components/AdminPanel';
+import { User as UserIcon, Lightbulb, Calendar, Crown, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface DashboardProps {
@@ -36,7 +37,7 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue="record" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+          <TabsList className={`grid w-full h-auto p-1 ${user.role === 'head' ? 'grid-cols-4' : 'grid-cols-3'}`}>
             <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
               <UserIcon className="h-4 w-4" />
               <span className="hidden sm:inline">My Record</span>
@@ -52,19 +53,29 @@ export default function Dashboard({ user }: DashboardProps) {
               <span className="hidden sm:inline">Calendar & Leaders</span>
               <span className="sm:hidden">Calendar</span>
             </TabsTrigger>
+            {user.role === 'head' && (
+              <TabsTrigger value="admin" className="gap-2 py-3 data-[state=active]:shadow-soft">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Admin Panel</span>
+                <span className="sm:hidden">Admin</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="record" className="mt-6">
             <MyRecord user={user} />
           </TabsContent>
-
           <TabsContent value="propose" className="mt-6">
             <ProposeEvent user={user} />
           </TabsContent>
-
           <TabsContent value="calendar" className="mt-6">
             <CalendarLeaders />
           </TabsContent>
+          {user.role === 'head' && (
+            <TabsContent value="admin" className="mt-6">
+              <AdminPanel />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
