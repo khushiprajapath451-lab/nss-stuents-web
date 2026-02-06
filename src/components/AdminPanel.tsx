@@ -97,11 +97,15 @@ export function AdminPanel() {
               <SelectValue placeholder="Select an event" />
             </SelectTrigger>
             <SelectContent>
-              {upcomingEvents.map((e) => (
-                <SelectItem key={e.id} value={e.id}>
-                  {e.title} — {new Date(e.date).toLocaleDateString()}
-                </SelectItem>
-              ))}
+              {upcomingEvents.length === 0 ? (
+                <SelectItem value="none" disabled>No events available</SelectItem>
+              ) : (
+                upcomingEvents.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.title} — {new Date(e.date).toLocaleDateString()}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
 

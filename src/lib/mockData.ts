@@ -54,160 +54,79 @@ export interface Certificate {
   type: 'participation' | 'excellence' | 'leadership';
 }
 
-// Seeded Users with roll numbers
-export const users: User[] = [
-  {
-    id: '1',
-    rollNumber: '24881A05Y3',
-    name: 'Khushi Sharma',
-    role: 'volunteer',
-    avatar: 'KS',
-    totalHours: 0,
-    eventsAttended: 0,
-    badges: [],
-    isInactive: false,
-  },
-  {
-    id: '2',
-    rollNumber: '24881A05AG',
-    name: 'Rahul Verma',
-    role: 'volunteer',
-    avatar: 'RV',
-    totalHours: 0,
-    eventsAttended: 0,
-    badges: [],
-    isInactive: false,
-  },
-  {
-    id: '3',
-    rollNumber: '24881A05AP',
-    name: 'Priya Reddy',
-    role: 'volunteer',
-    avatar: 'PR',
-    totalHours: 0,
-    eventsAttended: 0,
-    badges: [],
-    isInactive: false,
-  },
-  {
-    id: '4',
-    rollNumber: '24881A05Z4',
-    name: 'Amit Kumar',
-    role: 'volunteer',
-    avatar: 'AK',
-    totalHours: 0,
-    eventsAttended: 0,
-    badges: [],
-    isInactive: false,
-  },
-  {
-    id: '5',
-    rollNumber: 'NSS_HEAD',
-    name: 'Dr. Suresh Nair',
-    role: 'head',
-    avatar: 'SN',
-    totalHours: 120,
-    eventsAttended: 35,
-    badges: ['leader', 'mentor', 'pioneer'],
-    isInactive: false,
-  },
-];
+// Helper to generate volunteer users
+function generateVolunteers(): User[] {
+  const volunteers: User[] = [];
+  let id = 1;
 
-// Upcoming & Past Events
-export const events: Event[] = [
-  {
-    id: '1',
-    title: 'Blood Donation Camp',
-    date: '2024-02-15',
-    time: '9:00 AM - 4:00 PM',
-    location: 'Main Auditorium',
-    description: 'Annual blood donation drive in collaboration with Red Cross',
-    category: 'blood_drive',
-    attendees: 45,
-    maxAttendees: 100,
-    status: 'upcoming',
-  },
-  {
-    id: '2',
-    title: 'Campus Cleanup Drive',
-    date: '2024-02-20',
-    time: '7:00 AM - 11:00 AM',
-    location: 'College Campus',
-    description: 'Monthly campus beautification and waste management drive',
-    category: 'cleanup',
-    attendees: 30,
-    maxAttendees: 50,
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    title: 'Health Awareness Workshop',
-    date: '2024-02-10',
-    time: '2:00 PM - 5:00 PM',
-    location: 'Seminar Hall B',
-    description: 'Workshop on mental health awareness for students',
-    category: 'awareness',
-    attendees: 80,
-    maxAttendees: 80,
-    status: 'completed',
-  },
-  {
-    id: '4',
-    title: 'Tree Plantation Drive',
-    date: '2024-02-25',
-    time: '8:00 AM - 12:00 PM',
-    location: 'College Ground',
-    description: 'Plant 500 saplings around the campus',
-    category: 'cleanup',
-    attendees: 25,
-    maxAttendees: 75,
-    status: 'upcoming',
-  },
-];
+  const addVolunteer = (rollNumber: string) => {
+    const initials = rollNumber.slice(-2);
+    volunteers.push({
+      id: String(id++),
+      rollNumber,
+      name: `Volunteer ${rollNumber.slice(-3)}`,
+      role: 'volunteer',
+      avatar: initials,
+      totalHours: 0,
+      eventsAttended: 0,
+      badges: [],
+      isInactive: false,
+    });
+  };
 
-// Event Proposals
-export const eventProposals: EventProposal[] = [
-  {
-    id: '1',
-    title: 'Blood Drive Feb 15',
-    description: 'Organize a mega blood donation camp with Red Cross partnership',
-    proposedBy: 'Khushi Sharma',
-    proposedDate: '2024-02-15',
-    votes: 23,
-    voters: ['1', '2', '3'],
-    status: 'approved',
-  },
-  {
-    id: '2',
-    title: 'Village Education Camp',
-    description: 'Teach basic computer skills to students in nearby villages',
-    proposedBy: 'Rahul Verma',
-    proposedDate: '2024-03-01',
-    votes: 18,
-    voters: ['1', '3'],
-    status: 'pending',
-  },
-  {
-    id: '3',
-    title: 'Swachh Campus Week',
-    description: 'Week-long cleanliness and hygiene awareness campaign',
-    proposedBy: 'Priya Reddy',
-    proposedDate: '2024-03-10',
-    votes: 15,
-    voters: ['2'],
-    status: 'pending',
-  },
-  {
-    id: '4',
-    title: 'Senior Citizen Support',
-    description: 'Visit and assist elderly at local old age home',
-    proposedBy: 'Amit Kumar',
-    proposedDate: '2024-03-15',
-    votes: 12,
-    voters: [],
-    status: 'pending',
-  },
-];
+  // Specific roll numbers
+  addVolunteer('24881A05AY3');
+  addVolunteer('24881A04Y8');
+
+  // 24881A05Z1 to 24881A05Z9
+  for (let i = 1; i <= 9; i++) {
+    addVolunteer(`24881A05Z${i}`);
+  }
+
+  // 24881A05AA to 24881A05AZ
+  for (let c = 65; c <= 90; c++) {
+    addVolunteer(`24881A05A${String.fromCharCode(c)}`);
+  }
+
+  // 24881A05BA to 24881A05BY
+  for (let c = 65; c <= 89; c++) {
+    addVolunteer(`24881A05B${String.fromCharCode(c)}`);
+  }
+
+  return volunteers;
+}
+
+const volunteerUsers = generateVolunteers();
+
+// NSS Head account
+const nssHead: User = {
+  id: 'head',
+  rollNumber: 'NSS',
+  name: 'NSS Head',
+  role: 'head',
+  avatar: 'NH',
+  totalHours: 0,
+  eventsAttended: 0,
+  badges: [],
+  isInactive: false,
+};
+
+export const users: User[] = [...volunteerUsers, nssHead];
+
+// NSS Head password is 67899, all volunteers use 12345
+export function authenticateUser(rollNumber: string, password: string): User | null {
+  const user = users.find((u) => u.rollNumber.toUpperCase() === rollNumber.toUpperCase());
+  if (!user) return null;
+  if (user.role === 'head' && password === '67899') return user;
+  if (user.role === 'volunteer' && password === '12345') return user;
+  return null;
+}
+
+// Events - empty at start
+export const events: Event[] = [];
+
+// Event Proposals - empty at start
+export const eventProposals: EventProposal[] = [];
 
 // Urgent Posts
 export const urgentPosts: UrgentPost[] = [
@@ -216,7 +135,7 @@ export const urgentPosts: UrgentPost[] = [
     title: '🩸 Blood Donation - URGENT!',
     description: 'Patient at City Hospital requires O- blood urgently. Contact immediately if you can donate.',
     urgencyLevel: 'critical',
-    postedAt: '2024-02-04T10:30:00',
+    postedAt: new Date().toISOString(),
     category: 'Blood Donation',
     contact: '+91 9876543210',
   },
@@ -225,7 +144,7 @@ export const urgentPosts: UrgentPost[] = [
     title: '🧬 Swab Donation Feb 10',
     description: 'Register for stem cell donation drive this weekend. Save lives by joining the donor registry.',
     urgencyLevel: 'high',
-    postedAt: '2024-02-04T08:00:00',
+    postedAt: new Date(Date.now() - 3600000).toISOString(),
     category: 'Swab Donation',
     contact: 'nss@college.edu',
   },
@@ -234,13 +153,13 @@ export const urgentPosts: UrgentPost[] = [
     title: '📚 Book Collection Drive',
     description: 'Collecting books for underprivileged school. Donate your old textbooks and novels.',
     urgencyLevel: 'medium',
-    postedAt: '2024-02-03T14:00:00',
+    postedAt: new Date(Date.now() - 86400000).toISOString(),
     category: 'Donation',
     contact: 'library@college.edu',
   },
 ];
 
-// Certificates for current user - empty by default for new volunteers
+// Certificates - empty
 export const certificates: Certificate[] = [];
 
 // Badge definitions
@@ -254,8 +173,5 @@ export const badgeInfo: Record<string, { name: string; icon: string; description
   pioneer: { name: 'Pioneer', icon: '🚀', description: 'Founded new initiative' },
 };
 
-// Leaderboard
-export const leaderboard = users
-  .filter(u => u.role === 'volunteer')
-  .sort((a, b) => b.totalHours - a.totalHours)
-  .slice(0, 5);
+// Leaderboard - empty since no activity
+export const leaderboard: User[] = [];
