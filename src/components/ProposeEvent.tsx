@@ -97,58 +97,6 @@ export function ProposeEvent({ user }: ProposeEventProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Top Proposal Highlight */}
-      {topProposal && topProposal.status === 'pending' && (
-        <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
-          <CardHeader>
-            <div className="flex items-center gap-2 mb-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              <Badge className="bg-primary/20 text-primary border-0">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Top Proposal
-              </Badge>
-            </div>
-            <CardTitle className="text-xl">{topProposal.title}</CardTitle>
-            <CardDescription>{topProposal.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>By {topProposal.proposedBy}</span>
-                <span>•</span>
-                <span>{new Date(topProposal.proposedDate).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={topProposal.voters.includes(user.id) ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleVote(topProposal.id)}
-                  className="gap-2"
-                >
-                  <ThumbsUp className="h-4 w-4" />
-                  {topProposal.votes} votes
-                </Button>
-                {user.role === 'head' && (
-                  <>
-                    <Button size="sm" onClick={() => handleApprove(topProposal.id)}>
-                      <Check className="h-4 w-4 mr-1" />
-                      Approve
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleReject(topProposal.id)}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Reject
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Create Proposal Button */}
       <div className="flex justify-between items-center">
@@ -207,70 +155,82 @@ export function ProposeEvent({ user }: ProposeEventProps) {
       </div>
 
       {/* Proposals List */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {sortedProposals.map((proposal, index) => (
-          <Card
-            key={proposal.id}
-            className={`transition-all hover:shadow-soft ${
-              proposal.status === 'approved' ? 'border-success/30 bg-success/5' : ''
-            } ${proposal.status === 'rejected' ? 'opacity-60' : ''}`}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  {index === 0 && proposal.status === 'pending' && (
-                    <span className="text-lg">🏆</span>
-                  )}
-                  <CardTitle className="text-base">{proposal.title}</CardTitle>
+      {sortedProposals.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Sparkles className="h-10 w-10 text-muted-foreground/40 mb-4" />
+            <h3 className="font-semibold text-lg text-muted-foreground">No events proposed yet</h3>
+            <p className="text-sm text-muted-foreground/70 mt-1 max-w-sm">
+              Be the first to propose an event for the community. Click "Propose Event" above to get started!
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {sortedProposals.map((proposal, index) => (
+            <Card
+              key={proposal.id}
+              className={`transition-all hover:shadow-soft ${
+                proposal.status === 'approved' ? 'border-success/30 bg-success/5' : ''
+              } ${proposal.status === 'rejected' ? 'opacity-60' : ''}`}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {index === 0 && proposal.status === 'pending' && (
+                      <span className="text-lg">🏆</span>
+                    )}
+                    <CardTitle className="text-base">{proposal.title}</CardTitle>
+                  </div>
+                  {getStatusBadge(proposal.status)}
                 </div>
-                {getStatusBadge(proposal.status)}
-              </div>
-              <CardDescription className="line-clamp-2">{proposal.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  <p>By {proposal.proposedBy}</p>
-                  <p>{new Date(proposal.proposedDate).toLocaleDateString()}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {proposal.status === 'pending' && (
-                    <Button
-                      variant={proposal.voters.includes(user.id) ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => handleVote(proposal.id)}
-                      className="gap-1"
-                    >
-                      <ThumbsUp className="h-3 w-3" />
-                      {proposal.votes}
-                    </Button>
-                  )}
-                  {user.role === 'head' && proposal.status === 'pending' && (
-                    <>
+                <CardDescription className="line-clamp-2">{proposal.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    <p>By {proposal.proposedBy}</p>
+                    <p>{new Date(proposal.proposedDate).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {proposal.status === 'pending' && (
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-success"
-                        onClick={() => handleApprove(proposal.id)}
+                        variant={proposal.voters.includes(user.id) ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleVote(proposal.id)}
+                        className="gap-1"
                       >
-                        <Check className="h-4 w-4" />
+                        <ThumbsUp className="h-3 w-3" />
+                        {proposal.votes}
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                        onClick={() => handleReject(proposal.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
+                    )}
+                    {user.role === 'head' && proposal.status === 'pending' && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-success"
+                          onClick={() => handleApprove(proposal.id)}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => handleReject(proposal.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

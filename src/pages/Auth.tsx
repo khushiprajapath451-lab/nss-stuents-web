@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { users } from '@/lib/mockData';
+import { authenticateUser } from '@/lib/mockData';
 import { toast } from 'sonner';
 
 interface AuthProps {
-  onLogin: (user: typeof users[0]) => void;
+  onLogin: (user: typeof import('@/lib/mockData').users[0]) => void;
 }
 
 export default function Auth({ onLogin }: AuthProps) {
@@ -21,12 +21,11 @@ export default function Auth({ onLogin }: AuthProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
     await new Promise((r) => setTimeout(r, 600));
 
-    const user = users.find((u) => u.rollNumber.toUpperCase() === rollNumber.toUpperCase());
+    const user = authenticateUser(rollNumber, password);
 
-    if (user && password === '12345') {
+    if (user) {
       onLogin(user);
       toast.success(`Welcome, ${user.name}!`);
       navigate('/dashboard');
