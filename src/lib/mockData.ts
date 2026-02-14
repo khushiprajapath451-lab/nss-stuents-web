@@ -8,8 +8,11 @@ export interface User {
   avatar: string;
   totalHours: number;
   eventsAttended: number;
+  activitiesCompleted: number;
   badges: string[];
   isInactive: boolean;
+  inactiveWarnings: number; // 0, 1, or 2 — expelled after 2
+  lastActivityDate: string | null;
 }
 
 export interface Event {
@@ -54,83 +57,51 @@ export interface Certificate {
   type: 'participation' | 'excellence' | 'leadership';
 }
 
-// Helper to generate volunteer users
-interface VolunteerEntry {
-  rollNumber: string;
-  password: string;
-}
-
-function generateVolunteers(): { users: User[]; passwords: Map<string, string> } {
-  const entries: VolunteerEntry[] = [];
-  let pwCounter = 10000;
-
-  const addEntry = (rollNumber: string) => {
-    entries.push({ rollNumber, password: String(pwCounter++) });
-  };
-
-  // Specific roll numbers
-  addEntry('24881A05AY3');
-  addEntry('24881A04Y8');
-
-  // 24881A05Z1 to 24881A05Z9
-  for (let i = 1; i <= 9; i++) {
-    addEntry(`24881A05Z${i}`);
-  }
-
-  // 24881A05AA to 24881A05AZ
-  for (let c = 65; c <= 90; c++) {
-    addEntry(`24881A05A${String.fromCharCode(c)}`);
-  }
-
-  // 24881A05BA to 24881A05BY
-  for (let c = 65; c <= 89; c++) {
-    addEntry(`24881A05B${String.fromCharCode(c)}`);
-  }
-
-  const passwords = new Map<string, string>();
-  const users: User[] = entries.map((entry, index) => {
-    passwords.set(entry.rollNumber.toUpperCase(), entry.password);
-    const initials = entry.rollNumber.slice(-2);
-    return {
-      id: String(index + 1),
-      rollNumber: entry.rollNumber,
-      name: `Volunteer ${entry.rollNumber.slice(-3)}`,
-      role: 'volunteer' as const,
-      avatar: initials,
-      totalHours: 0,
-      eventsAttended: 0,
-      badges: [],
-      isInactive: false,
-    };
-  });
-
-  return { users, passwords };
-}
-
-const { users: volunteerUsers, passwords: volunteerPasswords } = generateVolunteers();
-
-// NSS Head account
-const nssHead: User = {
-  id: 'head',
-  rollNumber: 'NSS',
-  name: 'NSS Head',
-  role: 'head',
-  avatar: 'NH',
+// Only 2 users
+const volunteer: User = {
+  id: '1',
+  rollNumber: '24881A05AG',
+  name: 'Volunteer AG',
+  role: 'volunteer',
+  avatar: 'AG',
   totalHours: 0,
   eventsAttended: 0,
+  activitiesCompleted: 0,
   badges: [],
   isInactive: false,
+  inactiveWarnings: 0,
+  lastActivityDate: null,
 };
 
-export const users: User[] = [...volunteerUsers, nssHead];
+const nssHead: User = {
+  id: 'head',
+  rollNumber: 'NSRINIVAS',
+  name: 'N. Srinivas',
+  role: 'head',
+  avatar: 'NS',
+  totalHours: 0,
+  eventsAttended: 0,
+  activitiesCompleted: 0,
+  badges: [],
+  isInactive: false,
+  inactiveWarnings: 0,
+  lastActivityDate: null,
+};
 
-// NSS Head password: 12345, volunteers: unique 10000-10064
+export const users: User[] = [volunteer, nssHead];
+
+const credentials: Record<string, string> = {
+  '24881A05AG': 'vce@ag',
+  'NSRINIVAS': 'vce@ns',
+};
+
+export const ACTIVITY_GOAL = 180;
+
 export function authenticateUser(rollNumber: string, password: string): User | null {
   const upper = rollNumber.toUpperCase();
   const user = users.find((u) => u.rollNumber.toUpperCase() === upper);
   if (!user) return null;
-  if (user.role === 'head' && password === '12345') return user;
-  if (user.role === 'volunteer' && volunteerPasswords.get(upper) === password) return user;
+  if (credentials[upper] === password) return user;
   return null;
 }
 

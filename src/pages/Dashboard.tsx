@@ -12,6 +12,11 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user }: DashboardProps) {
+  const isHead = user.role === 'head';
+
+  // Tabs config: head gets no "My Record", volunteers get no "Admin"
+  const defaultTab = isHead ? 'propose' : 'record';
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-6 space-y-6">
@@ -20,9 +25,9 @@ export default function Dashboard({ user }: DashboardProps) {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-bold font-display">
-                Welcome, {user.name.split(' ')[0]}!
+                Welcome, {user.name}!
               </h1>
-              {user.role === 'head' && (
+              {isHead && (
                 <Badge className="bg-primary/20 text-primary border-0">
                   <Crown className="h-3 w-3 mr-1" />
                   NSS Head
@@ -30,19 +35,23 @@ export default function Dashboard({ user }: DashboardProps) {
               )}
             </div>
             <p className="text-muted-foreground mt-1">
-              Track your volunteer activities and make a difference.
+              {isHead
+                ? 'Manage volunteers, events, and track performance.'
+                : 'Track your volunteer activities and make a difference.'}
             </p>
           </div>
         </div>
 
         {/* Dashboard Tabs */}
-        <Tabs defaultValue="record" className="space-y-6">
-          <TabsList className={`grid w-full h-auto p-1 ${user.role === 'head' ? 'grid-cols-4' : 'grid-cols-3'}`}>
-            <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
-              <UserIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">My Record</span>
-              <span className="sm:hidden">Record</span>
-            </TabsTrigger>
+        <Tabs defaultValue={defaultTab} className="space-y-6">
+          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-3'}`}>
+            {!isHead && (
+              <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
+                <UserIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">My Record</span>
+                <span className="sm:hidden">Record</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="propose" className="gap-2 py-3 data-[state=active]:shadow-soft">
               <Lightbulb className="h-4 w-4" />
               <span className="hidden sm:inline">Propose Event</span>
@@ -53,7 +62,7 @@ export default function Dashboard({ user }: DashboardProps) {
               <span className="hidden sm:inline">Calendar & Leaders</span>
               <span className="sm:hidden">Calendar</span>
             </TabsTrigger>
-            {user.role === 'head' && (
+            {isHead && (
               <TabsTrigger value="admin" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">Admin Panel</span>
@@ -62,16 +71,18 @@ export default function Dashboard({ user }: DashboardProps) {
             )}
           </TabsList>
 
-          <TabsContent value="record" className="mt-6">
-            <MyRecord user={user} />
-          </TabsContent>
+          {!isHead && (
+            <TabsContent value="record" className="mt-6">
+              <MyRecord user={user} />
+            </TabsContent>
+          )}
           <TabsContent value="propose" className="mt-6">
             <ProposeEvent user={user} />
           </TabsContent>
           <TabsContent value="calendar" className="mt-6">
             <CalendarLeaders />
           </TabsContent>
-          {user.role === 'head' && (
+          {isHead && (
             <TabsContent value="admin" className="mt-6">
               <AdminPanel />
             </TabsContent>
