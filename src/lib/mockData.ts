@@ -91,8 +91,8 @@ const nssHead: User = {
 export const users: User[] = [volunteer, nssHead];
 
 const credentials: Record<string, string> = {
-  '24881A05AG': 'vce@ag',
-  'NSRINIVAS': 'vce@ns',
+  '24881A05AG': 'vceag',
+  'NSRINIVAS': 'vcens',
 };
 
 export const ACTIVITY_GOAL = 180;
