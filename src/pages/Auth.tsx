@@ -58,10 +58,10 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="rollNumber"
                 type="text"
-                placeholder="e.g. 24881A05Y3"
+                placeholder="e.g. 24881A05AG or nsrinivas"
                 value={rollNumber}
-                onChange={(e) => setRollNumber(e.target.value.toUpperCase())}
-                className="uppercase"
+                onChange={(e) => setRollNumber(e.target.value)}
+                className=""
                 required
               />
             </div>
