@@ -1,4 +1,5 @@
 import { User, certificates, events, badgeInfo } from '@/lib/mockData';
+import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -27,7 +28,8 @@ export function MyRecord({ user }: MyRecordProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Inactivity Warning */}
+      {/* Eligible Events Claim Section */}
+      <EligibleEventsClaim user={user} />
       {user.isInactive && (
         <Card className="border-warning bg-warning/5">
           <CardContent className="flex items-center gap-4 py-4">
