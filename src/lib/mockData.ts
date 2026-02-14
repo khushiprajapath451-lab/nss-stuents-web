@@ -158,3 +158,44 @@ export const badgeInfo: Record<string, { name: string; icon: string; description
 
 // Leaderboard - empty since no activity
 export const leaderboard: User[] = [];
+
+// --- Roll Call Attendance Store ---
+export interface AttendanceRecord {
+  eventId: string;
+  eventTitle: string;
+  eventDate: string;
+  markedAt: string; // ISO timestamp when faculty marked attendance
+  presentVolunteerIds: string[];
+  claimedBy: Record<string, { role: 'participant' | 'organizer'; claimedAt: string }>;
+}
+
+// Shared mutable store for attendance records (faculty marks → volunteer claims)
+export const attendanceRecords: AttendanceRecord[] = [];
+
+export const CLAIM_WINDOW_HOURS = 24;
+
+export function isClaimWindowOpen(record: AttendanceRecord): boolean {
+  const markedTime = new Date(record.markedAt).getTime();
+  const now = Date.now();
+  return now - markedTime < CLAIM_WINDOW_HOURS * 60 * 60 * 1000;
+}
+
+export function getEligibleEventsForVolunteer(volunteerId: string): AttendanceRecord[] {
+  return attendanceRecords.filter(
+    (r) =>
+      r.presentVolunteerIds.includes(volunteerId) &&
+      !r.claimedBy[volunteerId] &&
+      isClaimWindowOpen(r)
+  );
+}
+
+export function claimEvent(
+  recordIndex: number,
+  volunteerId: string,
+  role: 'participant' | 'organizer'
+) {
+  const record = attendanceRecords[recordIndex];
+  if (record) {
+    record.claimedBy[volunteerId] = { role, claimedAt: new Date().toISOString() };
+  }
+}

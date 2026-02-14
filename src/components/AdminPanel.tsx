@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { users, events, User, ACTIVITY_GOAL } from '@/lib/mockData';
+import { users, events, User, ACTIVITY_GOAL, attendanceRecords, AttendanceRecord } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -62,7 +62,23 @@ export function AdminPanel() {
       toast.error('Please select an event first.');
       return;
     }
-    toast.success(`Attendance saved: ${attendedCount} volunteer(s) marked present.`);
+    const event = upcomingEvents.find((e) => e.id === selectedEvent);
+    if (event) {
+      const presentIds = Object.entries(attendance)
+        .filter(([, present]) => present)
+        .map(([id]) => id);
+      attendanceRecords.push({
+        eventId: event.id,
+        eventTitle: event.title,
+        eventDate: event.date,
+        markedAt: new Date().toISOString(),
+        presentVolunteerIds: presentIds,
+        claimedBy: {},
+      });
+    }
+    toast.success(`Roll call saved: ${attendedCount} volunteer(s) marked present. They can now claim this event within 24 hours.`);
+    setAttendance({});
+    setSelectedEvent('');
   };
 
   const handleSaveHours = () => {
@@ -214,8 +230,11 @@ export function AdminPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <CheckCircle className="h-5 w-5 text-primary" />
-            Mark Attendance
+            Roll Call — Mark Attendance
           </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Call names during events and mark present. Marked volunteers can self-claim within 24 hours.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <Select value={selectedEvent} onValueChange={setSelectedEvent}>
