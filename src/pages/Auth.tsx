@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -45,9 +46,7 @@ export default function Auth({ onLogin }: AuthProps) {
 
       <Card className="w-full max-w-sm relative animate-fade-in shadow-elevated">
         <CardHeader className="text-center space-y-4 pb-2">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl hero-gradient shadow-glow">
-            <span className="text-2xl font-bold text-primary-foreground">YS</span>
-          </div>
+          <img src={yuvasevaLogo} alt="YuvaSeva" className="h-16 w-16 mx-auto rounded-2xl" />
           <p className="text-muted-foreground text-sm">Sign in to continue</p>
         </CardHeader>
 
