@@ -1,4 +1,4 @@
-// Mock data for NSS Portal
+// Mock data for YuvaSeva Portal
 
 export interface User {
   id: string;
@@ -91,8 +91,8 @@ const nssHead: User = {
 export const users: User[] = [volunteer, nssHead];
 
 const credentials: Record<string, string> = {
-  '24881A05AG': 'vceag',
-  'NSRINIVAS': 'vcens',
+  '24881A05AG': 'vce@ag',
+  'NSRINIVAS': 'vce@ns',
 };
 
 export const ACTIVITY_GOAL = 180;

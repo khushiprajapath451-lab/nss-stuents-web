@@ -34,11 +34,10 @@ export function Header({ user, onLogout }: HeaderProps) {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
-            <span className="text-lg font-bold text-primary-foreground">N</span>
+            <span className="text-lg font-bold text-primary-foreground">Y</span>
           </div>
           <div className="hidden sm:block">
-            <h1 className="font-display text-lg font-bold text-foreground">NSS Portal</h1>
-            <p className="text-xs text-muted-foreground">Not Me But You</p>
+            <h1 className="font-display text-lg font-bold text-foreground">YuvaSeva</h1>
           </div>
         </Link>
 

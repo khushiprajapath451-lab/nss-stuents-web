@@ -100,7 +100,7 @@ export function AdminPanel() {
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-primary">NSS Head Admin Panel</h3>
+            <h3 className="font-semibold text-primary">YuvaSeva Admin Panel</h3>
             <p className="text-sm text-muted-foreground">
               Track activity race to {ACTIVITY_GOAL}, manage attendance, and handle expulsions.
             </p>
