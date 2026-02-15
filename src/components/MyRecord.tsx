@@ -1,4 +1,5 @@
-import { User, certificates, events, badgeInfo } from '@/lib/mockData';
+import { useState } from 'react';
+import { User, certificates, events, badgeInfo, attendanceRecords } from '@/lib/mockData';
 import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +12,62 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { AlertTriangle, Award, Calendar, Clock, Download, TrendingUp } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { AlertTriangle, Award, Calendar, Clock, Download, Plus, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface MyRecordProps {
   user: User;
 }
 
+interface UserEvent {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  category: string;
+}
+
 export function MyRecord({ user }: MyRecordProps) {
+  const [addedEvents, setAddedEvents] = useState<UserEvent[]>([]);
+  const [newEvent, setNewEvent] = useState({ title: '', description: '', date: '', category: '' });
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Check if volunteer has any attendance records marked as present
+  const hasAttendanceMarked = attendanceRecords.some(
+    (r) => r.presentVolunteerIds.includes(user.id)
+  );
+
+  const handleAddEvent = () => {
+    if (!newEvent.title || !newEvent.date) {
+      toast.error('Please fill in event title and date');
+      return;
+    }
+    const event: UserEvent = {
+      id: String(Date.now()),
+      title: newEvent.title,
+      description: newEvent.description,
+      date: newEvent.date,
+      category: newEvent.category || 'General',
+    };
+    setAddedEvents((prev) => [...prev, event]);
+    setNewEvent({ title: '', description: '', date: '', category: '' });
+    setDialogOpen(false);
+    toast.success('Event added to your record!');
+  };
+
   // Only show events the user actually attended (none for new volunteers)
   const userEvents = user.eventsAttended > 0
     ? events.filter((e) => e.status === 'completed').slice(0, user.eventsAttended)
@@ -49,6 +97,110 @@ export function MyRecord({ user }: MyRecordProps) {
         </Card>
       )}
 
+      {/* Add Event Section */}
+      <Card className={!hasAttendanceMarked ? 'opacity-60' : 'border-primary/30'}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Plus className="h-5 w-5 text-primary" />
+                Add Your Events
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                {hasAttendanceMarked
+                  ? 'You have been marked present! Add your event details below.'
+                  : 'This section is enabled after the admin marks your attendance as present.'}
+              </p>
+            </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button disabled={!hasAttendanceMarked} className="gap-2 shadow-glow">
+                  <Plus className="h-4 w-4" />
+                  Add Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Event to Your Record</DialogTitle>
+                  <DialogDescription>
+                    Describe the event you participated in.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="event-title">Event Title</Label>
+                    <Input
+                      id="event-title"
+                      placeholder="e.g., Blood Donation Camp"
+                      value={newEvent.title}
+                      onChange={(e) => setNewEvent((p) => ({ ...p, title: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="event-desc">Description</Label>
+                    <Textarea
+                      id="event-desc"
+                      placeholder="Describe your participation and contributions..."
+                      value={newEvent.description}
+                      onChange={(e) => setNewEvent((p) => ({ ...p, description: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="event-date">Event Date</Label>
+                    <Input
+                      id="event-date"
+                      type="date"
+                      value={newEvent.date}
+                      onChange={(e) => setNewEvent((p) => ({ ...p, date: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="event-category">Category</Label>
+                    <Input
+                      id="event-category"
+                      placeholder="e.g., Blood Drive, Cleanup, Workshop"
+                      value={newEvent.category}
+                      onChange={(e) => setNewEvent((p) => ({ ...p, category: e.target.value }))}
+                    />
+                  </div>
+                  <Button onClick={handleAddEvent} className="w-full">
+                    Add to Record
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        {addedEvents.length > 0 && (
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Description</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {addedEvents.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell className="font-medium">{event.title}</TableCell>
+                    <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">{event.category}</Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
+                      {event.description || '—'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        )}
+      </Card>
+
       {/* Stats Overview */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="group hover:shadow-soft transition-shadow">
@@ -70,7 +222,7 @@ export function MyRecord({ user }: MyRecordProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Events Attended</p>
-                <p className="text-3xl font-bold font-display text-primary">{user.eventsAttended}</p>
+                <p className="text-3xl font-bold font-display text-primary">{user.eventsAttended + addedEvents.length}</p>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Calendar className="h-6 w-6 text-primary" />

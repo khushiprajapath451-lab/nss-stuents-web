@@ -1,10 +1,9 @@
 import { User } from '@/lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MyRecord } from '@/components/MyRecord';
-import { ProposeEvent } from '@/components/ProposeEvent';
 import { CalendarLeaders } from '@/components/CalendarLeaders';
 import { AdminPanel } from '@/components/AdminPanel';
-import { User as UserIcon, Lightbulb, Calendar, Crown, Shield } from 'lucide-react';
+import { User as UserIcon, Calendar, Crown, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface DashboardProps {
@@ -15,7 +14,7 @@ export default function Dashboard({ user }: DashboardProps) {
   const isHead = user.role === 'head';
 
   // Tabs config: head gets no "My Record", volunteers get no "Admin"
-  const defaultTab = isHead ? 'propose' : 'record';
+  const defaultTab = isHead ? 'calendar' : 'record';
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +43,7 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue={defaultTab} className="space-y-6">
-          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-3'}`}>
+          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-2' : 'grid-cols-2'}`}>
             {!isHead && (
               <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <UserIcon className="h-4 w-4" />
@@ -52,11 +51,6 @@ export default function Dashboard({ user }: DashboardProps) {
                 <span className="sm:hidden">Record</span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="propose" className="gap-2 py-3 data-[state=active]:shadow-soft">
-              <Lightbulb className="h-4 w-4" />
-              <span className="hidden sm:inline">Propose Event</span>
-              <span className="sm:hidden">Propose</span>
-            </TabsTrigger>
             <TabsTrigger value="calendar" className="gap-2 py-3 data-[state=active]:shadow-soft">
               <Calendar className="h-4 w-4" />
               <span className="hidden sm:inline">Calendar & Leaders</span>
@@ -76,9 +70,6 @@ export default function Dashboard({ user }: DashboardProps) {
               <MyRecord user={user} />
             </TabsContent>
           )}
-          <TabsContent value="propose" className="mt-6">
-            <ProposeEvent user={user} />
-          </TabsContent>
           <TabsContent value="calendar" className="mt-6">
             <CalendarLeaders />
           </TabsContent>

@@ -224,7 +224,7 @@ export function AdminPanel() {
             Roll Call — Mark Attendance
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Call names during events and mark present. Marked volunteers can self-claim within 24 hours.
+            Select an event and mark volunteers present. Marked volunteers can add events to their record.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -245,35 +245,48 @@ export function AdminPanel() {
             </SelectContent>
           </Select>
 
+          {/* Always show volunteer list */}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">Present</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Roll Number</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {volunteers.map((v) => (
+                <TableRow key={v.id} className={attendance[v.id] ? 'bg-primary/5' : ''}>
+                  <TableCell>
+                    <Checkbox
+                      checked={!!attendance[v.id]}
+                      onCheckedChange={() => toggleAttendance(v.id)}
+                      disabled={!selectedEvent}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{v.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{v.rollNumber}</TableCell>
+                  <TableCell>
+                    {attendance[v.id] ? (
+                      <Badge className="bg-primary/20 text-primary border-0">Present</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground">Absent</Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {!selectedEvent && (
+            <p className="text-sm text-muted-foreground text-center">Select an event above to mark attendance.</p>
+          )}
+
           {selectedEvent && (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Present</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Roll Number</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {volunteers.map((v) => (
-                    <TableRow key={v.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={!!attendance[v.id]}
-                          onCheckedChange={() => toggleAttendance(v.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{v.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{v.rollNumber}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Button onClick={handleSaveAttendance} className="shadow-glow">
-                Save Attendance
-              </Button>
-            </>
+            <Button onClick={handleSaveAttendance} className="shadow-glow">
+              Save Attendance ({Object.values(attendance).filter(Boolean).length} present)
+            </Button>
           )}
         </CardContent>
       </Card>
