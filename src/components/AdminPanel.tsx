@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { users, events, User, ACTIVITY_GOAL, attendanceRecords, AttendanceRecord } from '@/lib/mockData';
+import { users, events, User, ACTIVITY_GOAL, attendanceRecords, AttendanceRecord, eventProposals } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,8 @@ import { toast } from 'sonner';
 
 export function AdminPanel() {
   const volunteers = users.filter((u) => u.role === 'volunteer');
-  const upcomingEvents = events.filter((e) => e.status === 'upcoming');
+  // Approved proposals become available events for roll call
+  const approvedEvents = eventProposals.filter((p) => p.status === 'approved');
 
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
@@ -58,7 +59,7 @@ export function AdminPanel() {
       toast.error('Please select an event first.');
       return;
     }
-    const event = upcomingEvents.find((e) => e.id === selectedEvent);
+    const event = approvedEvents.find((e) => e.id === selectedEvent);
     if (event) {
       const presentIds = Object.entries(attendance)
         .filter(([, present]) => present)
@@ -66,7 +67,7 @@ export function AdminPanel() {
       attendanceRecords.push({
         eventId: event.id,
         eventTitle: event.title,
-        eventDate: event.date,
+        eventDate: event.proposedDate,
         markedAt: new Date().toISOString(),
         presentVolunteerIds: presentIds,
         claimedBy: {},
@@ -233,12 +234,12 @@ export function AdminPanel() {
               <SelectValue placeholder="Select an event" />
             </SelectTrigger>
             <SelectContent>
-              {upcomingEvents.length === 0 ? (
-                <SelectItem value="none" disabled>No events available</SelectItem>
+              {approvedEvents.length === 0 ? (
+                <SelectItem value="none" disabled>No approved events available</SelectItem>
               ) : (
-                upcomingEvents.map((e) => (
+                approvedEvents.map((e) => (
                   <SelectItem key={e.id} value={e.id}>
-                    {e.title} — {new Date(e.date).toLocaleDateString()}
+                    {e.title} — {new Date(e.proposedDate).toLocaleDateString()}
                   </SelectItem>
                 ))
               )}
