@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ChevronRight } from 'lucide-react';
-import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
+
 
 interface CollegeSelectorProps {
   onSelect: (college: string) => void;
@@ -29,12 +29,7 @@ export function CollegeSelector({ onSelect }: CollegeSelectorProps) {
 
       <Card className="w-full max-w-md relative animate-fade-in shadow-elevated">
         <CardContent className="pt-8 pb-8 space-y-6 text-center">
-          <img src={yuvasevaLogo} alt="YuvaSeva" className="h-16 w-16 mx-auto" />
-
-          <div>
-            <h1 className="text-2xl font-bold font-display">YuvaSeva</h1>
-            <p className="text-muted-foreground text-sm mt-1">Select your college to continue</p>
-          </div>
+          <p className="text-base font-semibold text-foreground">Select your college to continue</p>
 
           <Select defaultValue="vardhaman">
             <SelectTrigger className="w-full text-left">

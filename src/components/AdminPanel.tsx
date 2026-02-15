@@ -3,7 +3,7 @@ import { users, events, User, ACTIVITY_GOAL, attendanceRecords, AttendanceRecord
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertTriangle, CheckCircle, Clock, Shield, Trophy, Users as UsersIcon, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Shield, Trophy, Users as UsersIcon, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function AdminPanel() {
@@ -30,16 +30,12 @@ export function AdminPanel() {
 
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
-  const [hours, setHours] = useState<Record<string, string>>({});
+  
   const [warnings, setWarnings] = useState<Record<string, number>>({});
   const [expelled, setExpelled] = useState<Record<string, boolean>>({});
 
   const toggleAttendance = (userId: string) => {
     setAttendance((prev) => ({ ...prev, [userId]: !prev[userId] }));
-  };
-
-  const handleHoursChange = (userId: string, value: string) => {
-    setHours((prev) => ({ ...prev, [userId]: value }));
   };
 
   const issueWarning = (userId: string, userName: string) => {
@@ -79,11 +75,6 @@ export function AdminPanel() {
     toast.success(`Roll call saved: ${attendedCount} volunteer(s) marked present. They can now claim this event within 24 hours.`);
     setAttendance({});
     setSelectedEvent('');
-  };
-
-  const handleSaveHours = () => {
-    const filled = Object.entries(hours).filter(([, v]) => v && Number(v) > 0);
-    toast.success(`Hours updated for ${filled.length} volunteer(s).`);
   };
 
   // Sort volunteers by activities completed (descending) for the 180-activity race
@@ -287,50 +278,6 @@ export function AdminPanel() {
         </CardContent>
       </Card>
 
-      {/* Assign Hours */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Clock className="h-5 w-5 text-primary" />
-            Assign Participation Hours
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Roll Number</TableHead>
-                <TableHead>Current Hours</TableHead>
-                <TableHead className="w-32">Add Hours</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {volunteers.map((v) => (
-                <TableRow key={v.id}>
-                  <TableCell className="font-medium">{v.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{v.rollNumber}</TableCell>
-                  <TableCell>{v.totalHours}h</TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="24"
-                      placeholder="0"
-                      value={hours[v.id] || ''}
-                      onChange={(e) => handleHoursChange(v.id, e.target.value)}
-                      className="w-20"
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <Button onClick={handleSaveHours} className="mt-4 shadow-glow">
-            Save Hours
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }

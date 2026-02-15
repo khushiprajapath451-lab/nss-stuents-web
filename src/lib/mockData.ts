@@ -115,7 +115,7 @@ export const eventProposals: EventProposal[] = [];
 export const urgentPosts: UrgentPost[] = [
   {
     id: '1',
-    title: '🩸 Blood Donation - URGENT!',
+    title: 'Blood Donation - URGENT!',
     description: 'Patient at City Hospital requires O- blood urgently. Contact immediately if you can donate.',
     urgencyLevel: 'critical',
     postedAt: new Date().toISOString(),
@@ -124,7 +124,7 @@ export const urgentPosts: UrgentPost[] = [
   },
   {
     id: '2',
-    title: '🧬 Swab Donation Feb 10',
+    title: 'Swab Donation Feb 10',
     description: 'Register for stem cell donation drive this weekend. Save lives by joining the donor registry.',
     urgencyLevel: 'high',
     postedAt: new Date(Date.now() - 3600000).toISOString(),
@@ -133,7 +133,7 @@ export const urgentPosts: UrgentPost[] = [
   },
   {
     id: '3',
-    title: '📚 Book Collection Drive',
+    title: 'Book Collection Drive',
     description: 'Collecting books for underprivileged school. Donate your old textbooks and novels.',
     urgencyLevel: 'medium',
     postedAt: new Date(Date.now() - 86400000).toISOString(),
