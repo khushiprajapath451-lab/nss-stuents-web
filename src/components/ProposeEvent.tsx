@@ -22,29 +22,36 @@ interface ProposeEventProps {
 }
 
 export function ProposeEvent({ user }: ProposeEventProps) {
-  const [proposals, setProposals] = useState(eventProposals);
+  const [proposals, setProposals] = useState(() => [...eventProposals]);
   const [newProposal, setNewProposal] = useState({ title: '', description: '', date: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Sync local state with shared store on mount/re-render
+  const syncProposals = (updated: typeof proposals) => {
+    setProposals(updated);
+    // Keep the shared array in sync so other components/users see changes
+    eventProposals.length = 0;
+    updated.forEach((p) => eventProposals.push(p));
+  };
 
   const sortedProposals = [...proposals].sort((a, b) => b.votes - a.votes);
   const topProposal = sortedProposals[0];
 
   const handleVote = (proposalId: string) => {
-    setProposals((prev) =>
-      prev.map((p) => {
-        if (p.id === proposalId) {
-          const hasVoted = p.voters.includes(user.id);
-          return {
-            ...p,
-            votes: hasVoted ? p.votes - 1 : p.votes + 1,
-            voters: hasVoted
-              ? p.voters.filter((v) => v !== user.id)
-              : [...p.voters, user.id],
-          };
-        }
-        return p;
-      })
-    );
+    const updated = proposals.map((p) => {
+      if (p.id === proposalId) {
+        const hasVoted = p.voters.includes(user.id);
+        return {
+          ...p,
+          votes: hasVoted ? p.votes - 1 : p.votes + 1,
+          voters: hasVoted
+            ? p.voters.filter((v) => v !== user.id)
+            : [...p.voters, user.id],
+        };
+      }
+      return p;
+    });
+    syncProposals(updated);
   };
 
   const handleSubmitProposal = () => {
@@ -64,23 +71,19 @@ export function ProposeEvent({ user }: ProposeEventProps) {
       status: 'pending' as const,
     };
 
-    setProposals((prev) => [...prev, proposal]);
+    syncProposals([...proposals, proposal]);
     setNewProposal({ title: '', description: '', date: '' });
     setDialogOpen(false);
     toast.success('Proposal submitted successfully!');
   };
 
   const handleApprove = (proposalId: string) => {
-    setProposals((prev) =>
-      prev.map((p) => (p.id === proposalId ? { ...p, status: 'approved' as const } : p))
-    );
+    syncProposals(proposals.map((p) => (p.id === proposalId ? { ...p, status: 'approved' as const } : p)));
     toast.success('Event approved!');
   };
 
   const handleReject = (proposalId: string) => {
-    setProposals((prev) =>
-      prev.map((p) => (p.id === proposalId ? { ...p, status: 'rejected' as const } : p))
-    );
+    syncProposals(proposals.map((p) => (p.id === proposalId ? { ...p, status: 'rejected' as const } : p)));
     toast.info('Event rejected');
   };
 
