@@ -7,7 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { GraduationCap, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 
 interface CollegeSelectorProps {
   onSelect: (college: string) => void;
@@ -28,12 +29,10 @@ export function CollegeSelector({ onSelect }: CollegeSelectorProps) {
 
       <Card className="w-full max-w-md relative animate-fade-in shadow-elevated">
         <CardContent className="pt-8 pb-8 space-y-6 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl hero-gradient shadow-glow">
-            <GraduationCap className="h-8 w-8 text-primary-foreground" />
-          </div>
+          <img src={yuvasevaLogo} alt="YuvaSeva" className="h-16 w-16 mx-auto" />
 
           <div>
-            <h1 className="text-2xl font-bold font-display">NSS Portal</h1>
+            <h1 className="text-2xl font-bold font-display">YuvaSeva</h1>
             <p className="text-muted-foreground text-sm mt-1">Select your college to continue</p>
           </div>
 

@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Menu, X, LogOut, User, Home, LayoutDashboard } from 'lucide-react';
+import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 
 interface HeaderProps {
   user?: { name: string; rollNumber: string; avatar: string } | null;
@@ -33,9 +34,7 @@ export function Header({ user, onLogout }: HeaderProps) {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-glow">
-            <span className="text-lg font-bold text-primary-foreground">Y</span>
-          </div>
+          <img src={yuvasevaLogo} alt="YuvaSeva" className="h-10 w-10 rounded-xl" />
           <div className="hidden sm:block">
             <h1 className="font-display text-lg font-bold text-foreground">YuvaSeva</h1>
           </div>
