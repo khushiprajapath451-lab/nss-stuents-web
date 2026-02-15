@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UrgentPosts } from '@/components/UrgentPosts';
 import { CollegeSelector } from '@/components/CollegeSelector';
-import { ArrowRight, Heart } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 
 export default function Index() {
   const [collegeSelected, setCollegeSelected] = useState(false);
@@ -22,7 +23,7 @@ export default function Index() {
         <div className="container relative py-24 lg:py-36 text-center">
           <div className="max-w-2xl mx-auto space-y-8 animate-fade-in">
             <div className="flex justify-center">
-              <Heart className="h-16 w-16 text-white/90" fill="currentColor" />
+              <img src={yuvasevaLogo} alt="YuvaSeva" className="h-20 w-20 rounded-2xl shadow-lg" />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display text-white leading-tight">
               YuvaSeva
@@ -49,7 +50,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Urgent Posts Feed */}
+      {/* Posts section */}
       <div className="container py-8">
         <UrgentPosts />
       </div>
