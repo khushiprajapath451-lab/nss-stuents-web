@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { User, certificates, events, badgeInfo, attendanceRecords } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { User, certificates, events, badgeInfo, attendanceRecords, CLAIM_WINDOW_HOURS } from '@/lib/mockData';
 import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,9 +46,12 @@ export function MyRecord({ user }: MyRecordProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Check if volunteer has any attendance records marked as present
-  const hasAttendanceMarked = attendanceRecords.some(
-    (r) => r.presentVolunteerIds.includes(user.id)
-  );
+  // Check if volunteer has been marked present within the claim window (1 week)
+  const hasAttendanceMarked = attendanceRecords.some((r) => {
+    if (!r.presentVolunteerIds.includes(user.id)) return false;
+    const markedTime = new Date(r.markedAt).getTime();
+    return Date.now() - markedTime < CLAIM_WINDOW_HOURS * 60 * 60 * 1000;
+  });
 
   const handleAddEvent = () => {
     if (!newEvent.title || !newEvent.date) {
@@ -108,8 +111,8 @@ export function MyRecord({ user }: MyRecordProps) {
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 {hasAttendanceMarked
-                  ? 'You have been marked present! Add your event details below.'
-                  : 'This section is enabled after the admin marks your attendance as present.'}
+                  ? 'You have been marked present! Add your event details within 1 week.'
+                  : 'This section is enabled after the admin marks your attendance as present (1 week window).'}
               </p>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

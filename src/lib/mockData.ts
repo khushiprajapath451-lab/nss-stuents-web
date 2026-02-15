@@ -172,7 +172,7 @@ export interface AttendanceRecord {
 // Shared mutable store for attendance records (faculty marks → volunteer claims)
 export const attendanceRecords: AttendanceRecord[] = [];
 
-export const CLAIM_WINDOW_HOURS = 24;
+export const CLAIM_WINDOW_HOURS = 24 * 7; // 1 week
 
 export function isClaimWindowOpen(record: AttendanceRecord): boolean {
   const markedTime = new Date(record.markedAt).getTime();
