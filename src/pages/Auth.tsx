@@ -46,7 +46,7 @@ export default function Auth({ onLogin }: AuthProps) {
       <Card className="w-full max-w-sm relative animate-fade-in shadow-elevated">
         <CardHeader className="text-center space-y-4 pb-2">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl hero-gradient shadow-glow">
-            <span className="text-2xl font-bold text-primary-foreground">NSS</span>
+            <span className="text-2xl font-bold text-primary-foreground">YS</span>
           </div>
           <p className="text-muted-foreground text-sm">Sign in to continue</p>
         </CardHeader>
@@ -58,7 +58,7 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="rollNumber"
                 type="text"
-                placeholder="e.g. 24881A05AG or nsrinivas"
+                placeholder="e.g. 24881A05AG or NSRINIVAS"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
                 className=""
@@ -70,10 +70,10 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="password"
                 type="password"
-                placeholder="5-digit password"
+                placeholder="6-character password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                maxLength={5}
+                maxLength={6}
                 required
               />
             </div>

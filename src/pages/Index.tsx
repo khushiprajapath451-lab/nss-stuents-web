@@ -25,10 +25,10 @@ export default function Index() {
               <Heart className="h-16 w-16 text-white/90" fill="currentColor" />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display text-white leading-tight">
-              Not Me But You
+              YuvaSeva
             </h1>
             <p className="text-lg text-white/80 max-w-md mx-auto">
-              Join the National Service Scheme. Track your volunteer journey, participate in events, and make a difference.
+              Track your volunteer journey, participate in events, and make a difference.
             </p>
             <div className="pt-4">
               <Link to="/auth">
