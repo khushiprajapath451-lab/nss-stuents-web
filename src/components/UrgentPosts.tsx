@@ -2,8 +2,9 @@ import { urgentPosts } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, Phone, ChevronRight } from 'lucide-react';
+import { AlertTriangle, Clock, Phone, MapPin, Droplets, ChevronRight, HandHelping } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 export function UrgentPosts() {
   const getUrgencyStyles = (level: string) => {
@@ -17,6 +18,8 @@ export function UrgentPosts() {
     }
   };
 
+  if (urgentPosts.length === 0) return null;
+
   return (
     <section className="py-8">
       <div className="flex items-center gap-3 mb-6">
@@ -24,8 +27,8 @@ export function UrgentPosts() {
           <AlertTriangle className="h-5 w-5 text-urgent" />
         </div>
         <div>
-          <h2 className="font-display text-2xl font-bold text-foreground">Urgent Needs</h2>
-          <p className="text-sm text-muted-foreground">Immediate help required</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">Urgent Alerts</h2>
+          <p className="text-sm text-muted-foreground">Immediate help required — volunteer now!</p>
         </div>
       </div>
 
@@ -57,20 +60,55 @@ export function UrgentPosts() {
               </CardTitle>
             </CardHeader>
             
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {post.description}
               </p>
+
+              {/* Details */}
+              <div className="space-y-1.5 text-sm">
+                {post.personInNeed && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <HandHelping className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{post.personInNeed}</span>
+                  </div>
+                )}
+                {post.location && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{post.location}</span>
+                  </div>
+                )}
+                {post.bloodGroup && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Droplets className="h-3.5 w-3.5 shrink-0 text-urgent" />
+                    <span>Blood Group: <strong>{post.bloodGroup}</strong></span>
+                  </div>
+                )}
+                {post.helpType && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{post.helpType}</span>
+                  </div>
+                )}
+              </div>
               
-              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between pt-3 border-t border-border/50">
                 <Badge variant="outline" className="text-xs">
                   {post.category}
                 </Badge>
-                <Button variant="ghost" size="sm" className="gap-1 text-primary">
-                  <Phone className="h-3 w-3" />
-                  Contact
-                  <ChevronRight className="h-3 w-3" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground text-xs">
+                    <Phone className="h-3 w-3" />
+                    {post.contact}
+                  </Button>
+                  <Link to="/auth">
+                    <Button size="sm" className="gap-1 bg-urgent hover:bg-urgent/90 text-urgent-foreground shadow-sm">
+                      <HandHelping className="h-3 w-3" />
+                      Volunteer
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>

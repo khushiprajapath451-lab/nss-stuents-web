@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { UrgentPosts } from '@/components/UrgentPosts';
+import { HomeEvents } from '@/components/HomeEvents';
+import { ServiceShowcase } from '@/components/ServiceShowcase';
 import { CollegeSelector } from '@/components/CollegeSelector';
 import { ArrowRight } from 'lucide-react';
 import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
@@ -50,9 +52,16 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Posts section */}
-      <div className="container py-8">
+      {/* Content sections */}
+      <div className="container">
+        {/* Urgent Alerts */}
         <UrgentPosts />
+
+        {/* Upcoming Events */}
+        <HomeEvents />
+
+        {/* Volunteer Showcase */}
+        <ServiceShowcase />
       </div>
     </div>
   );

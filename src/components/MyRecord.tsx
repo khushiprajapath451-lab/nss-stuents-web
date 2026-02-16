@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { User, certificates, events, badgeInfo, attendanceRecords, CLAIM_WINDOW_HOURS } from '@/lib/mockData';
 import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
+import { PostService } from '@/components/PostService';
+import { RewardCard } from '@/components/RewardCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -79,6 +81,12 @@ export function MyRecord({ user }: MyRecordProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Reward Points */}
+      <RewardCard user={user} />
+
+      {/* Post Service */}
+      <PostService user={user} />
+
       {/* Eligible Events Claim Section */}
       <EligibleEventsClaim user={user} />
       {user.isInactive && (

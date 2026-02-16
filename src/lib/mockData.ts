@@ -11,8 +11,9 @@ export interface User {
   activitiesCompleted: number;
   badges: string[];
   isInactive: boolean;
-  inactiveWarnings: number; // 0, 1, or 2 — expelled after 2
+  inactiveWarnings: number;
   lastActivityDate: string | null;
+  rewardPoints: number;
 }
 
 export interface Event {
@@ -37,6 +38,8 @@ export interface EventProposal {
   votes: number;
   voters: string[];
   status: 'pending' | 'approved' | 'rejected';
+  location?: string;
+  time?: string;
 }
 
 export interface UrgentPost {
@@ -47,6 +50,30 @@ export interface UrgentPost {
   postedAt: string;
   category: string;
   contact: string;
+  location?: string;
+  bloodGroup?: string;
+  helpType?: string;
+  personInNeed?: string;
+}
+
+export interface ServicePost {
+  id: string;
+  volunteerId: string;
+  volunteerName: string;
+  title: string;
+  description: string;
+  date: string;
+  photos: string[]; // URLs
+  status: 'pending' | 'approved' | 'rejected';
+  postedAt: string;
+  pointsAwarded: number;
+}
+
+export interface RewardMilestone {
+  points: number;
+  name: string;
+  icon: string;
+  description: string;
 }
 
 export interface Certificate {
@@ -71,6 +98,7 @@ const volunteer: User = {
   isInactive: false,
   inactiveWarnings: 0,
   lastActivityDate: null,
+  rewardPoints: 0,
 };
 
 const nssHead: User = {
@@ -86,6 +114,7 @@ const nssHead: User = {
   isInactive: false,
   inactiveWarnings: 0,
   lastActivityDate: null,
+  rewardPoints: 0,
 };
 
 export const users: User[] = [volunteer, nssHead];
@@ -111,7 +140,7 @@ export const events: Event[] = [];
 // Event Proposals - empty at start
 export const eventProposals: EventProposal[] = [];
 
-// Urgent Posts
+// Urgent Posts - starts with sample data
 export const urgentPosts: UrgentPost[] = [
   {
     id: '1',
@@ -121,6 +150,10 @@ export const urgentPosts: UrgentPost[] = [
     postedAt: new Date().toISOString(),
     category: 'Blood Donation',
     contact: '+91 9876543210',
+    location: 'City Hospital, Main Road',
+    bloodGroup: 'O-',
+    personInNeed: 'Patient at City Hospital',
+    helpType: 'Blood Donation',
   },
   {
     id: '2',
@@ -130,6 +163,8 @@ export const urgentPosts: UrgentPost[] = [
     postedAt: new Date(Date.now() - 3600000).toISOString(),
     category: 'Swab Donation',
     contact: 'nss@college.edu',
+    location: 'College Auditorium',
+    helpType: 'Swab Donation',
   },
   {
     id: '3',
@@ -139,11 +174,33 @@ export const urgentPosts: UrgentPost[] = [
     postedAt: new Date(Date.now() - 86400000).toISOString(),
     category: 'Donation',
     contact: 'library@college.edu',
+    location: 'College Library',
+    helpType: 'Book Donation',
   },
 ];
 
+// Service Posts - volunteer service showcase
+export const servicePosts: ServicePost[] = [];
+
 // Certificates - empty
 export const certificates: Certificate[] = [];
+
+// Reward Milestones
+export const rewardMilestones: RewardMilestone[] = [
+  { points: 50, name: 'Starter', icon: '🌟', description: 'Complete 5 services' },
+  { points: 100, name: 'Active Volunteer', icon: '💪', description: 'Earned 100 points' },
+  { points: 250, name: 'Community Champion', icon: '🏅', description: 'Earned 250 points' },
+  { points: 500, name: 'Service Legend', icon: '🏆', description: 'Earned 500 points' },
+  { points: 1000, name: 'YuvaSeva Hero', icon: '👑', description: 'Earned 1000 points' },
+];
+
+// Points per action
+export const POINTS = {
+  EVENT_PARTICIPATION: 10,
+  EVENT_ORGANIZING: 20,
+  SERVICE_POST_APPROVED: 15,
+  URGENT_VOLUNTEER: 25,
+};
 
 // Badge definitions
 export const badgeInfo: Record<string, { name: string; icon: string; description: string }> = {
@@ -164,12 +221,11 @@ export interface AttendanceRecord {
   eventId: string;
   eventTitle: string;
   eventDate: string;
-  markedAt: string; // ISO timestamp when faculty marked attendance
+  markedAt: string;
   presentVolunteerIds: string[];
   claimedBy: Record<string, { role: 'participant' | 'organizer'; claimedAt: string }>;
 }
 
-// Shared mutable store for attendance records (faculty marks → volunteer claims)
 export const attendanceRecords: AttendanceRecord[] = [];
 
 export const CLAIM_WINDOW_HOURS = 24 * 7; // 1 week
@@ -197,5 +253,32 @@ export function claimEvent(
   const record = attendanceRecords[recordIndex];
   if (record) {
     record.claimedBy[volunteerId] = { role, claimedAt: new Date().toISOString() };
+    // Award points
+    const user = users.find((u) => u.id === volunteerId);
+    if (user) {
+      user.rewardPoints += role === 'organizer' ? POINTS.EVENT_ORGANIZING : POINTS.EVENT_PARTICIPATION;
+    }
   }
+}
+
+// --- Notification Store ---
+export interface Notification {
+  id: string;
+  type: 'event' | 'service' | 'reward' | 'alert';
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  userId?: string; // if specific to a user, else global
+}
+
+export const notifications: Notification[] = [];
+
+export function addNotification(n: Omit<Notification, 'id' | 'timestamp' | 'read'>) {
+  notifications.unshift({
+    ...n,
+    id: String(Date.now() + Math.random()),
+    timestamp: new Date().toISOString(),
+    read: false,
+  });
 }

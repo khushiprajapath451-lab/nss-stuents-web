@@ -23,7 +23,7 @@ interface ProposeEventProps {
 
 export function ProposeEvent({ user }: ProposeEventProps) {
   const [proposals, setProposals] = useState(() => [...eventProposals]);
-  const [newProposal, setNewProposal] = useState({ title: '', description: '', date: '' });
+  const [newProposal, setNewProposal] = useState({ title: '', description: '', date: '', location: '', time: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Sync local state with shared store on mount/re-render
@@ -66,13 +66,15 @@ export function ProposeEvent({ user }: ProposeEventProps) {
       description: newProposal.description,
       proposedBy: user.name,
       proposedDate: newProposal.date,
+      location: newProposal.location,
+      time: newProposal.time,
       votes: 1,
       voters: [user.id],
       status: 'pending' as const,
     };
 
     syncProposals([...proposals, proposal]);
-    setNewProposal({ title: '', description: '', date: '' });
+    setNewProposal({ title: '', description: '', date: '', location: '', time: '' });
     setDialogOpen(false);
     toast.success('Proposal submitted successfully!');
   };
@@ -147,6 +149,24 @@ export function ProposeEvent({ user }: ProposeEventProps) {
                   type="date"
                   value={newProposal.date}
                   onChange={(e) => setNewProposal((p) => ({ ...p, date: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="time">Time</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={newProposal.time}
+                  onChange={(e) => setNewProposal((p) => ({ ...p, time: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  placeholder="e.g., College Auditorium"
+                  value={newProposal.location}
+                  onChange={(e) => setNewProposal((p) => ({ ...p, location: e.target.value }))}
                 />
               </div>
               <Button onClick={handleSubmitProposal} className="w-full">
