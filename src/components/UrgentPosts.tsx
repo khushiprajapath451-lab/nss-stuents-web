@@ -18,7 +18,26 @@ export function UrgentPosts() {
     }
   };
 
-  if (urgentPosts.length === 0) return null;
+  if (urgentPosts.length === 0) {
+    return (
+      <section className="py-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-urgent/10">
+            <AlertTriangle className="h-5 w-5 text-urgent" />
+          </div>
+          <div>
+            <h2 className="font-display text-2xl font-bold text-foreground">Urgent Alerts</h2>
+            <p className="text-sm text-muted-foreground">Immediate help required — volunteer now!</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-center rounded-xl border border-dashed border-border bg-muted/30">
+          <AlertTriangle className="h-10 w-10 text-muted-foreground/40 mb-3" />
+          <p className="text-muted-foreground font-medium">No urgent alerts yet</p>
+          <p className="text-sm text-muted-foreground/70 mt-1">Alerts posted by admin will appear here.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-8">

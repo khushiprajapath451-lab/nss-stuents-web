@@ -140,44 +140,8 @@ export const events: Event[] = [];
 // Event Proposals - empty at start
 export const eventProposals: EventProposal[] = [];
 
-// Urgent Posts - starts with sample data
-export const urgentPosts: UrgentPost[] = [
-  {
-    id: '1',
-    title: 'Blood Donation - URGENT!',
-    description: 'Patient at City Hospital requires O- blood urgently. Contact immediately if you can donate.',
-    urgencyLevel: 'critical',
-    postedAt: new Date().toISOString(),
-    category: 'Blood Donation',
-    contact: '+91 9876543210',
-    location: 'City Hospital, Main Road',
-    bloodGroup: 'O-',
-    personInNeed: 'Patient at City Hospital',
-    helpType: 'Blood Donation',
-  },
-  {
-    id: '2',
-    title: 'Swab Donation Feb 10',
-    description: 'Register for stem cell donation drive this weekend. Save lives by joining the donor registry.',
-    urgencyLevel: 'high',
-    postedAt: new Date(Date.now() - 3600000).toISOString(),
-    category: 'Swab Donation',
-    contact: 'nss@college.edu',
-    location: 'College Auditorium',
-    helpType: 'Swab Donation',
-  },
-  {
-    id: '3',
-    title: 'Book Collection Drive',
-    description: 'Collecting books for underprivileged school. Donate your old textbooks and novels.',
-    urgencyLevel: 'medium',
-    postedAt: new Date(Date.now() - 86400000).toISOString(),
-    category: 'Donation',
-    contact: 'library@college.edu',
-    location: 'College Library',
-    helpType: 'Book Donation',
-  },
-];
+// Urgent Posts - empty until admin posts
+export const urgentPosts: UrgentPost[] = [];
 
 // Service Posts - volunteer service showcase
 export const servicePosts: ServicePost[] = [];
