@@ -20,8 +20,10 @@ export function PostService({ user }: PostServiceProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [, forceUpdate] = useState(0);
   const [newPost, setNewPost] = useState({
-    title: '', description: '', date: '', photoUrl: '',
+    title: '', description: '', date: '',
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const myPosts = servicePosts.filter((s) => s.volunteerId === user.id);
 
@@ -37,7 +39,7 @@ export function PostService({ user }: PostServiceProps) {
       title: newPost.title,
       description: newPost.description,
       date: newPost.date,
-      photos: newPost.photoUrl ? [newPost.photoUrl] : [],
+      photos: photoPreview ? [photoPreview] : [],
       status: 'pending',
       postedAt: new Date().toISOString(),
       pointsAwarded: 0,
@@ -48,7 +50,9 @@ export function PostService({ user }: PostServiceProps) {
       message: `"${newPost.title}" is pending admin approval.`,
       userId: user.id,
     });
-    setNewPost({ title: '', description: '', date: '', photoUrl: '' });
+    setNewPost({ title: '', description: '', date: '' });
+    setPhotoFile(null);
+    setPhotoPreview(null);
     setDialogOpen(false);
     toast.success('Service post submitted! Awaiting admin approval.');
     forceUpdate((n) => n + 1);
@@ -98,8 +102,23 @@ export function PostService({ user }: PostServiceProps) {
                   <Input type="date" value={newPost.date} onChange={(e) => setNewPost((p) => ({ ...p, date: e.target.value }))} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Photo URL (optional)</Label>
-                  <Input placeholder="https://..." value={newPost.photoUrl} onChange={(e) => setNewPost((p) => ({ ...p, photoUrl: e.target.value }))} />
+                  <Label>Photo (optional)</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setPhotoFile(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => setPhotoPreview(reader.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  {photoPreview && (
+                    <img src={photoPreview} alt="Preview" className="mt-2 rounded-md max-h-40 object-cover w-full" />
+                  )}
                 </div>
                 <Button onClick={handleSubmit} className="w-full">Submit Service Post</Button>
               </div>
