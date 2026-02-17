@@ -55,8 +55,8 @@ export function ProposeEvent({ user }: ProposeEventProps) {
   };
 
   const handleSubmitProposal = () => {
-    if (!newProposal.title || !newProposal.description || !newProposal.date) {
-      toast.error('Please fill in all fields');
+    if (!newProposal.title || !newProposal.description) {
+      toast.error('Please fill in title and description');
       return;
     }
 
