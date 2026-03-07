@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as XLSX from 'xlsx';
 import {
   users, User, ACTIVITY_GOAL, attendanceRecords, eventProposals,
   urgentPosts, servicePosts, POINTS, addNotification,
@@ -22,7 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle, CheckCircle, Shield, Trophy, Users as UsersIcon, XCircle,
-  Plus, Megaphone, Heart, Check, X, Gift,
+  Plus, Megaphone, Heart, Check, X, Gift, Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -135,6 +136,88 @@ export function AdminPanel() {
       setRewardPoints('');
       forceUpdate((n) => n + 1);
     }
+  };
+
+  const handleDownloadAttendanceExcel = () => {
+    if (attendanceRecords.length === 0) {
+      toast.error('No attendance records to download.');
+      return;
+    }
+
+    // Build rows grouped by branch-section
+    const grouped: Record<string, any[]> = {};
+
+    attendanceRecords.forEach((record) => {
+      Object.entries(record.claimedBy).forEach(([volunteerId, claim]) => {
+        const user = users.find((u) => u.id === volunteerId);
+        if (!user) return;
+        const key = `${user.branch}-${user.section}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push({
+          'Event Title': record.eventTitle,
+          'Event Date': record.eventDate,
+          'Volunteer Roll Number': user.rollNumber,
+          'Volunteer Name': user.name,
+          'Branch': user.branch,
+          'Section': user.section,
+          'Role': claim.role === 'organizer' ? 'Organizer' : 'Participant',
+          'Claim Time': new Date(claim.claimedAt).toLocaleString(),
+        });
+      });
+
+      // Also include present but unclaimed volunteers
+      record.presentVolunteerIds.forEach((vid) => {
+        if (record.claimedBy[vid]) return; // already handled
+        const user = users.find((u) => u.id === vid);
+        if (!user) return;
+        const key = `${user.branch}-${user.section}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push({
+          'Event Title': record.eventTitle,
+          'Event Date': record.eventDate,
+          'Volunteer Roll Number': user.rollNumber,
+          'Volunteer Name': user.name,
+          'Branch': user.branch,
+          'Section': user.section,
+          'Role': 'Present (Unclaimed)',
+          'Claim Time': '-',
+        });
+      });
+    });
+
+    const wb = XLSX.utils.book_new();
+    const sheetNames = Object.keys(grouped).sort();
+
+    if (sheetNames.length === 0) {
+      // Fallback: single sheet with all present volunteers
+      const allRows: any[] = [];
+      attendanceRecords.forEach((record) => {
+        record.presentVolunteerIds.forEach((vid) => {
+          const user = users.find((u) => u.id === vid);
+          if (!user) return;
+          allRows.push({
+            'Event Title': record.eventTitle,
+            'Event Date': record.eventDate,
+            'Volunteer Roll Number': user.rollNumber,
+            'Volunteer Name': user.name,
+            'Branch': user.branch,
+            'Section': user.section,
+            'Role': 'Present',
+            'Claim Time': '-',
+          });
+        });
+      });
+      const ws = XLSX.utils.json_to_sheet(allRows);
+      XLSX.utils.book_append_sheet(wb, ws, 'All');
+    } else {
+      sheetNames.forEach((name) => {
+        const ws = XLSX.utils.json_to_sheet(grouped[name]);
+        XLSX.utils.book_append_sheet(wb, ws, name);
+      });
+    }
+
+    XLSX.writeFile(wb, `YuvaSeva_Attendance_Report.xlsx`);
+    toast.success('Attendance Excel downloaded!');
   };
 
   const sortedByActivities = [...volunteers].sort((a, b) => b.activitiesCompleted - a.activitiesCompleted);
@@ -432,13 +515,17 @@ export function AdminPanel() {
         </CardContent>
       </Card>
 
-      {/* Mark Attendance */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CheckCircle className="h-5 w-5 text-primary" />
-            Roll Call — Mark Attendance
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              Roll Call — Mark Attendance
+            </CardTitle>
+            <Button variant="outline" size="sm" onClick={handleDownloadAttendanceExcel} className="gap-1">
+              <Download className="h-4 w-4" /> Download Attendance Excel
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground">Select an event and mark volunteers present.</p>
         </CardHeader>
         <CardContent className="space-y-4">

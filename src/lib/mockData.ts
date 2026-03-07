@@ -9,6 +9,8 @@ export interface User {
   totalHours: number;
   eventsAttended: number;
   activitiesCompleted: number;
+  branch: string;
+  section: string;
   badges: string[];
   isInactive: boolean;
   inactiveWarnings: number;
@@ -91,6 +93,8 @@ const volunteer: User = {
   name: 'Volunteer AG',
   role: 'volunteer',
   avatar: 'AG',
+  branch: 'CSE',
+  section: 'A',
   totalHours: 0,
   eventsAttended: 0,
   activitiesCompleted: 0,
@@ -107,6 +111,8 @@ const nssHead: User = {
   name: 'N. Srinivas',
   role: 'head',
   avatar: 'NS',
+  branch: 'CSE',
+  section: 'A',
   totalHours: 0,
   eventsAttended: 0,
   activitiesCompleted: 0,
