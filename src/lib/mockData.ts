@@ -137,6 +137,7 @@ const credentials: Record<string, string> = {
 };
 
 export const ACTIVITY_GOAL = 180;
+export const NSS_HOURS_GOAL = 240;
 
 export function authenticateUser(rollNumber: string, password: string): User | null {
   const upper = rollNumber.toUpperCase();
