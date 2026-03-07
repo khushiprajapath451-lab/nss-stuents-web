@@ -93,6 +93,8 @@ const volunteer: User = {
   name: 'Volunteer AG',
   role: 'volunteer',
   avatar: 'AG',
+  branch: 'CSE',
+  section: 'A',
   totalHours: 0,
   eventsAttended: 0,
   activitiesCompleted: 0,
