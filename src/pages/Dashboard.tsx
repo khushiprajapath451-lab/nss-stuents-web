@@ -90,6 +90,11 @@ export default function Dashboard({ user }: DashboardProps) {
           <TabsContent value="calendar" className="mt-6">
             <CalendarLeaders />
           </TabsContent>
+          {!isHead && (
+            <TabsContent value="profile" className="mt-6">
+              <VolunteerProfile user={user} />
+            </TabsContent>
+          )}
           {isHead && (
             <TabsContent value="admin" className="mt-6">
               <AdminPanel />
