@@ -45,7 +45,7 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue={defaultTab} className="space-y-6">
-          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-3'}`}>
+          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-4'}`}>
             {!isHead && (
               <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <UserIcon className="h-4 w-4" />
