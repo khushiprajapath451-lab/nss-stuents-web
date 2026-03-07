@@ -16,6 +16,8 @@ export interface User {
   inactiveWarnings: number;
   lastActivityDate: string | null;
   rewardPoints: number;
+  semester?: number;
+  certificates?: Certificate[];
 }
 
 export interface Event {
@@ -103,6 +105,8 @@ const volunteer: User = {
   inactiveWarnings: 0,
   lastActivityDate: null,
   rewardPoints: 0,
+  semester: 2,
+  certificates: [],
 };
 
 const nssHead: User = {
@@ -121,6 +125,8 @@ const nssHead: User = {
   inactiveWarnings: 0,
   lastActivityDate: null,
   rewardPoints: 0,
+  semester: 4,
+  certificates: [],
 };
 
 export const users: User[] = [volunteer, nssHead];
@@ -131,6 +137,7 @@ const credentials: Record<string, string> = {
 };
 
 export const ACTIVITY_GOAL = 180;
+export const NSS_HOURS_GOAL = 240;
 
 export function authenticateUser(rollNumber: string, password: string): User | null {
   const upper = rollNumber.toUpperCase();

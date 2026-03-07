@@ -4,7 +4,8 @@ import { MyRecord } from '@/components/MyRecord';
 import { ProposeEvent } from '@/components/ProposeEvent';
 import { CalendarLeaders } from '@/components/CalendarLeaders';
 import { AdminPanel } from '@/components/AdminPanel';
-import { User as UserIcon, Lightbulb, Calendar, Crown, Shield } from 'lucide-react';
+import { VolunteerProfile } from '@/components/VolunteerProfile';
+import { User as UserIcon, Lightbulb, Calendar, Crown, Shield, IdCard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface DashboardProps {
@@ -44,7 +45,7 @@ export default function Dashboard({ user }: DashboardProps) {
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue={defaultTab} className="space-y-6">
-          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-3'}`}>
+          <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-4'}`}>
             {!isHead && (
               <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <UserIcon className="h-4 w-4" />
@@ -62,6 +63,13 @@ export default function Dashboard({ user }: DashboardProps) {
               <span className="hidden sm:inline">Calendar & Leaders</span>
               <span className="sm:hidden">Calendar</span>
             </TabsTrigger>
+            {!isHead && (
+              <TabsTrigger value="profile" className="gap-2 py-3 data-[state=active]:shadow-soft">
+                <IdCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Profile</span>
+                <span className="sm:hidden">Profile</span>
+              </TabsTrigger>
+            )}
             {isHead && (
               <TabsTrigger value="admin" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <Shield className="h-4 w-4" />
@@ -82,6 +90,11 @@ export default function Dashboard({ user }: DashboardProps) {
           <TabsContent value="calendar" className="mt-6">
             <CalendarLeaders />
           </TabsContent>
+          {!isHead && (
+            <TabsContent value="profile" className="mt-6">
+              <VolunteerProfile user={user} />
+            </TabsContent>
+          )}
           {isHead && (
             <TabsContent value="admin" className="mt-6">
               <AdminPanel />
