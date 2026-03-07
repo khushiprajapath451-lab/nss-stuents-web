@@ -105,6 +105,8 @@ const volunteer: User = {
   inactiveWarnings: 0,
   lastActivityDate: null,
   rewardPoints: 0,
+  semester: 2,
+  certificates: [],
 };
 
 const nssHead: User = {
