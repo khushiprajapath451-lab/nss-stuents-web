@@ -515,13 +515,17 @@ export function AdminPanel() {
         </CardContent>
       </Card>
 
-      {/* Mark Attendance */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CheckCircle className="h-5 w-5 text-primary" />
-            Roll Call — Mark Attendance
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              Roll Call — Mark Attendance
+            </CardTitle>
+            <Button variant="outline" size="sm" onClick={handleDownloadAttendanceExcel} className="gap-1">
+              <Download className="h-4 w-4" /> Download Attendance Excel
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground">Select an event and mark volunteers present.</p>
         </CardHeader>
         <CardContent className="space-y-4">
