@@ -3,6 +3,8 @@ import { User, certificates, events, badgeInfo, attendanceRecords, CLAIM_WINDOW_
 import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
 import { PostService } from '@/components/PostService';
 import { RewardCard } from '@/components/RewardCard';
+import { ServiceTracker } from '@/components/ServiceTracker';
+import { PreviousEvents } from '@/components/PreviousEvents';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
