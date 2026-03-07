@@ -4,7 +4,8 @@ import { MyRecord } from '@/components/MyRecord';
 import { ProposeEvent } from '@/components/ProposeEvent';
 import { CalendarLeaders } from '@/components/CalendarLeaders';
 import { AdminPanel } from '@/components/AdminPanel';
-import { User as UserIcon, Lightbulb, Calendar, Crown, Shield } from 'lucide-react';
+import { VolunteerProfile } from '@/components/VolunteerProfile';
+import { User as UserIcon, Lightbulb, Calendar, Crown, Shield, IdCard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface DashboardProps {
