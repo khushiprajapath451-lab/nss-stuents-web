@@ -125,6 +125,8 @@ const nssHead: User = {
   inactiveWarnings: 0,
   lastActivityDate: null,
   rewardPoints: 0,
+  semester: 4,
+  certificates: [],
 };
 
 export const users: User[] = [volunteer, nssHead];
