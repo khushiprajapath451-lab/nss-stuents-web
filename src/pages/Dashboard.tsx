@@ -63,6 +63,13 @@ export default function Dashboard({ user }: DashboardProps) {
               <span className="hidden sm:inline">Calendar & Leaders</span>
               <span className="sm:hidden">Calendar</span>
             </TabsTrigger>
+            {!isHead && (
+              <TabsTrigger value="profile" className="gap-2 py-3 data-[state=active]:shadow-soft">
+                <IdCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Profile</span>
+                <span className="sm:hidden">Profile</span>
+              </TabsTrigger>
+            )}
             {isHead && (
               <TabsTrigger value="admin" className="gap-2 py-3 data-[state=active]:shadow-soft">
                 <Shield className="h-4 w-4" />
