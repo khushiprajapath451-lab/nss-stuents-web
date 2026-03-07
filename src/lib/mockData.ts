@@ -111,6 +111,8 @@ const nssHead: User = {
   name: 'N. Srinivas',
   role: 'head',
   avatar: 'NS',
+  branch: 'CSE',
+  section: 'A',
   totalHours: 0,
   eventsAttended: 0,
   activitiesCompleted: 0,
