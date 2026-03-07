@@ -83,6 +83,9 @@ export function MyRecord({ user }: MyRecordProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* NSS 240-Hour Service Tracker */}
+      <ServiceTracker user={user} />
+
       {/* Reward Points */}
       <RewardCard user={user} />
 
