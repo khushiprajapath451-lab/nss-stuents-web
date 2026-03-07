@@ -251,6 +251,9 @@ export function CalendarLeaders() {
           )}
         </CardContent>
       </Card>
+
+      {/* Volunteer Leaderboard */}
+      <VolunteerLeaderboard />
     </div>
   );
 }

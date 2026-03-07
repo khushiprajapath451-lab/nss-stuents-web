@@ -328,6 +328,9 @@ export function MyRecord({ user }: MyRecordProps) {
         </CardContent>
       </Card>
 
+      {/* Previous Events */}
+      <PreviousEvents user={user} />
+
       {/* Events History */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
