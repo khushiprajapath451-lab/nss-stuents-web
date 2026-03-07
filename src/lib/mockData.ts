@@ -16,6 +16,8 @@ export interface User {
   inactiveWarnings: number;
   lastActivityDate: string | null;
   rewardPoints: number;
+  semester?: number;
+  certificates?: Certificate[];
 }
 
 export interface Event {
