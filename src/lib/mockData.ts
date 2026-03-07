@@ -9,6 +9,8 @@ export interface User {
   totalHours: number;
   eventsAttended: number;
   activitiesCompleted: number;
+  branch: string;
+  section: string;
   badges: string[];
   isInactive: boolean;
   inactiveWarnings: number;
