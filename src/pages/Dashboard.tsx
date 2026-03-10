@@ -99,6 +99,11 @@ export default function Dashboard({ user }: DashboardProps) {
             <CalendarLeaders />
           </TabsContent>
           {!isHead && (
+            <TabsContent value="invite" className="mt-6">
+              <InviteVolunteers user={user} />
+            </TabsContent>
+          )}
+          {!isHead && (
             <TabsContent value="profile" className="mt-6">
               <VolunteerProfile user={user} />
             </TabsContent>

@@ -53,6 +53,7 @@ const App = () => {
                 )
               }
             />
+            <Route path="/invite/:code" element={<InviteLanding onLogin={handleLogin} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
