@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle, CheckCircle, Shield, Trophy, Users as UsersIcon, XCircle,
-  Plus, Megaphone, Heart, Check, X, Gift, Download,
+  Plus, Megaphone, Heart, Check, X, Gift, Download, Link2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
