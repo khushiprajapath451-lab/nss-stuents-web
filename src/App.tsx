@@ -8,6 +8,7 @@ import { Header } from '@/components/Header';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
+import InviteLanding from './pages/InviteLanding';
 import NotFound from './pages/NotFound';
 import { User } from '@/lib/mockData';
 
@@ -52,6 +53,7 @@ const App = () => {
                 )
               }
             />
+            <Route path="/invite/:code" element={<InviteLanding onLogin={handleLogin} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

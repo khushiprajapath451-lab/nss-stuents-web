@@ -4,6 +4,8 @@ import {
   users, User, ACTIVITY_GOAL, attendanceRecords, eventProposals,
   urgentPosts, servicePosts, POINTS, addNotification,
 } from '@/lib/mockData';
+import { InviteAnalytics } from '@/components/InviteAnalytics';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle, CheckCircle, Shield, Trophy, Users as UsersIcon, XCircle,
-  Plus, Megaphone, Heart, Check, X, Gift, Download,
+  Plus, Megaphone, Heart, Check, X, Gift, Download, Link2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -223,8 +225,19 @@ export function AdminPanel() {
   const sortedByActivities = [...volunteers].sort((a, b) => b.activitiesCompleted - a.activitiesCompleted);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Admin Header */}
+    <Tabs defaultValue="management" className="space-y-6 animate-fade-in">
+      <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+        <TabsTrigger value="management" className="gap-2 py-3">
+          <Shield className="h-4 w-4" />
+          Management
+        </TabsTrigger>
+        <TabsTrigger value="invite-analytics" className="gap-2 py-3">
+          <Link2 className="h-4 w-4" />
+          Invite Analytics
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="management" className="space-y-6">
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="flex items-center gap-4 py-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
@@ -577,6 +590,11 @@ export function AdminPanel() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="invite-analytics">
+        <InviteAnalytics />
+      </TabsContent>
+    </Tabs>
   );
 }
