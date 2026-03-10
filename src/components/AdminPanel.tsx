@@ -596,3 +596,5 @@ export function AdminPanel() {
         <InviteAnalytics />
       </TabsContent>
     </Tabs>
+  );
+}
