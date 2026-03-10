@@ -590,6 +590,9 @@ export function AdminPanel() {
           )}
         </CardContent>
       </Card>
-    </div>
-  );
-}
+      </TabsContent>
+
+      <TabsContent value="invite-analytics">
+        <InviteAnalytics />
+      </TabsContent>
+    </Tabs>
