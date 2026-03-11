@@ -5,6 +5,9 @@ import { PostService } from '@/components/PostService';
 import { RewardCard } from '@/components/RewardCard';
 import { ServiceTracker } from '@/components/ServiceTracker';
 import { PreviousEvents } from '@/components/PreviousEvents';
+import { ShareYourWork } from '@/components/ShareYourWork';
+import { MyBharatTracking } from '@/components/MyBharatTracking';
+import { SocialInternship } from '@/components/SocialInternship';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -327,6 +330,15 @@ export function MyRecord({ user }: MyRecordProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Share Your Work */}
+      <ShareYourWork user={user} />
+
+      {/* MyBharat Registration */}
+      <MyBharatTracking user={user} />
+
+      {/* Social Internship */}
+      <SocialInternship user={user} />
 
       {/* Previous Events */}
       <PreviousEvents user={user} />

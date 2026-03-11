@@ -5,6 +5,9 @@ import {
   urgentPosts, servicePosts, POINTS, addNotification,
 } from '@/lib/mockData';
 import { InviteAnalytics } from '@/components/InviteAnalytics';
+import { EventExpensePlanner } from '@/components/EventExpensePlanner';
+import { MyBharatAdmin } from '@/components/MyBharatAdmin';
+import { InternshipApprovals } from '@/components/InternshipApprovals';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +28,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   AlertTriangle, CheckCircle, Shield, Trophy, Users as UsersIcon, XCircle,
-  Plus, Megaphone, Heart, Check, X, Gift, Download, Link2,
+  Plus, Megaphone, Heart, Check, X, Gift, Download, Link2, ClipboardList, Globe, Briefcase,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -226,14 +229,31 @@ export function AdminPanel() {
 
   return (
     <Tabs defaultValue="management" className="space-y-6 animate-fade-in">
-      <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+      <TabsList className="grid w-full grid-cols-5 h-auto p-1">
         <TabsTrigger value="management" className="gap-2 py-3">
           <Shield className="h-4 w-4" />
-          Management
+          <span className="hidden sm:inline">Management</span>
+          <span className="sm:hidden">Manage</span>
+        </TabsTrigger>
+        <TabsTrigger value="expenses" className="gap-2 py-3">
+          <ClipboardList className="h-4 w-4" />
+          <span className="hidden sm:inline">Expenses</span>
+          <span className="sm:hidden">Cost</span>
+        </TabsTrigger>
+        <TabsTrigger value="mybharat" className="gap-2 py-3">
+          <Globe className="h-4 w-4" />
+          <span className="hidden sm:inline">MyBharat</span>
+          <span className="sm:hidden">Bharat</span>
+        </TabsTrigger>
+        <TabsTrigger value="internships" className="gap-2 py-3">
+          <Briefcase className="h-4 w-4" />
+          <span className="hidden sm:inline">Internships</span>
+          <span className="sm:hidden">Intern</span>
         </TabsTrigger>
         <TabsTrigger value="invite-analytics" className="gap-2 py-3">
           <Link2 className="h-4 w-4" />
-          Invite Analytics
+          <span className="hidden sm:inline">Invites</span>
+          <span className="sm:hidden">Invite</span>
         </TabsTrigger>
       </TabsList>
 
@@ -590,6 +610,18 @@ export function AdminPanel() {
           )}
         </CardContent>
       </Card>
+      </TabsContent>
+
+      <TabsContent value="expenses" className="space-y-6">
+        <EventExpensePlanner />
+      </TabsContent>
+
+      <TabsContent value="mybharat" className="space-y-6">
+        <MyBharatAdmin />
+      </TabsContent>
+
+      <TabsContent value="internships" className="space-y-6">
+        <InternshipApprovals />
       </TabsContent>
 
       <TabsContent value="invite-analytics">
