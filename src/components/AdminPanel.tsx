@@ -5,6 +5,9 @@ import {
   urgentPosts, servicePosts, POINTS, addNotification,
 } from '@/lib/mockData';
 import { InviteAnalytics } from '@/components/InviteAnalytics';
+import { EventExpensePlanner } from '@/components/EventExpensePlanner';
+import { MyBharatAdmin } from '@/components/MyBharatAdmin';
+import { InternshipApprovals } from '@/components/InternshipApprovals';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
