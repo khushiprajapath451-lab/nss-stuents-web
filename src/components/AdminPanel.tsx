@@ -612,6 +612,18 @@ export function AdminPanel() {
       </Card>
       </TabsContent>
 
+      <TabsContent value="expenses" className="space-y-6">
+        <EventExpensePlanner />
+      </TabsContent>
+
+      <TabsContent value="mybharat" className="space-y-6">
+        <MyBharatAdmin />
+      </TabsContent>
+
+      <TabsContent value="internships" className="space-y-6">
+        <InternshipApprovals />
+      </TabsContent>
+
       <TabsContent value="invite-analytics">
         <InviteAnalytics />
       </TabsContent>

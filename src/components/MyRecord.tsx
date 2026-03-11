@@ -331,6 +331,15 @@ export function MyRecord({ user }: MyRecordProps) {
         </CardContent>
       </Card>
 
+      {/* Share Your Work */}
+      <ShareYourWork user={user} />
+
+      {/* MyBharat Registration */}
+      <MyBharatTracking user={user} />
+
+      {/* Social Internship */}
+      <SocialInternship user={user} />
+
       {/* Previous Events */}
       <PreviousEvents user={user} />
 
