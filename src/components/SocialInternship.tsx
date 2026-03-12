@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@/lib/mockData';
+import { saveData, loadData, KEYS } from '@/lib/persistence';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +25,7 @@ export interface Internship {
   status: 'pending' | 'approved' | 'rejected';
 }
 
-// Shared store
+// Shared store (also persisted per user)
 export const internships: Internship[] = [];
 
 interface SocialInternshipProps {
@@ -38,6 +39,20 @@ export function SocialInternship({ user }: SocialInternshipProps) {
   });
   const [, forceUpdate] = useState(0);
 
+  // Load persisted internships on mount
+  useEffect(() => {
+    const saved = loadData<Internship[]>(user.id, KEYS.INTERNSHIPS, []);
+    if (saved.length > 0) {
+      // Merge saved internships into shared store
+      saved.forEach(s => {
+        if (!internships.find(i => i.id === s.id)) {
+          internships.push(s);
+        }
+      });
+      forceUpdate(n => n + 1);
+    }
+  }, [user.id]);
+
   const myInternships = internships.filter(i => i.volunteerId === user.id);
 
   const handleSubmit = () => {
@@ -45,13 +60,17 @@ export function SocialInternship({ user }: SocialInternshipProps) {
       toast.error('Please fill all required fields.');
       return;
     }
-    internships.push({
+    const newInternship: Internship = {
       id: String(Date.now()),
       volunteerId: user.id,
       volunteerName: user.name,
       ...form,
       status: 'pending',
-    });
+    };
+    internships.push(newInternship);
+    // Persist
+    const myAll = internships.filter(i => i.volunteerId === user.id);
+    saveData(user.id, KEYS.INTERNSHIPS, myAll);
     setForm({ organization: '', title: '', startDate: '', endDate: '', description: '' });
     setDialogOpen(false);
     forceUpdate(n => n + 1);
