@@ -119,6 +119,8 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
     setCertPreview('');
     setDialogOpen(false);
     toast.success('Previous event added! Hours, points & certificate updated.');
+    // Notify MyRecord to refresh stats
+    window.dispatchEvent(new Event('yuvaseva-stats-updated'));
   };
 
   return (
