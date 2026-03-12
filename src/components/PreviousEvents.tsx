@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { User } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { User, certificates as globalCerts, POINTS } from '@/lib/mockData';
+import { saveData, loadData, KEYS, saveUserStats, loadUserStats } from '@/lib/persistence';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,13 +28,37 @@ interface PreviousEventsProps {
 }
 
 export function PreviousEvents({ user }: PreviousEventsProps) {
-  const [events, setEvents] = useState<PreviousEvent[]>([]);
+  const [events, setEvents] = useState<PreviousEvent[]>(() =>
+    loadData<PreviousEvent[]>(user.id, KEYS.PREVIOUS_EVENTS, [])
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({
     title: '', description: '', date: '', category: '', hours: '',
   });
   const [certFile, setCertFile] = useState<File | null>(null);
   const [certPreview, setCertPreview] = useState<string>('');
+
+  // Restore user stats on mount
+  useEffect(() => {
+    const saved = loadUserStats(user.id);
+    if (saved) {
+      user.totalHours = saved.totalHours;
+      user.eventsAttended = saved.eventsAttended;
+      user.rewardPoints = saved.rewardPoints;
+      // Restore certificates
+      if (saved.certificates.length > 0) {
+        user.certificates = saved.certificates;
+        // Also sync global certs array
+        globalCerts.length = 0;
+        globalCerts.push(...saved.certificates);
+      }
+    }
+  }, [user.id]);
+
+  // Persist events whenever they change
+  useEffect(() => {
+    saveData(user.id, KEYS.PREVIOUS_EVENTS, events);
+  }, [events, user.id]);
 
   const handleCertUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,21 +75,52 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
       toast.error('Please fill in at least title and date.');
       return;
     }
+    const hours = parseFloat(form.hours) || 0;
     const newEvent: PreviousEvent = {
       id: String(Date.now()),
       title: form.title,
       description: form.description,
       date: form.date,
       category: form.category || 'General',
-      hours: parseFloat(form.hours) || 0,
+      hours,
       certificateFile: certPreview || undefined,
     };
-    setEvents((prev) => [newEvent, ...prev]);
+    const updated = [newEvent, ...events];
+    setEvents(updated);
+
+    // Update user stats
+    user.totalHours += hours;
+    user.eventsAttended += 1;
+    user.rewardPoints += POINTS.EVENT_PARTICIPATION;
+
+    // Add certificate for this event
+    const cert = {
+      id: newEvent.id,
+      eventName: newEvent.title,
+      date: newEvent.date,
+      hours,
+      type: 'participation' as const,
+    };
+    if (!user.certificates) user.certificates = [];
+    user.certificates.push(cert);
+    // Sync global certs
+    globalCerts.push(cert);
+
+    // Persist stats
+    saveUserStats(user.id, {
+      totalHours: user.totalHours,
+      eventsAttended: user.eventsAttended,
+      rewardPoints: user.rewardPoints,
+      certificates: user.certificates,
+    });
+
     setForm({ title: '', description: '', date: '', category: '', hours: '' });
     setCertFile(null);
     setCertPreview('');
     setDialogOpen(false);
-    toast.success('Previous event added to your record!');
+    toast.success('Previous event added! Hours, points & certificate updated.');
+    // Notify MyRecord to refresh stats
+    window.dispatchEvent(new Event('yuvaseva-stats-updated'));
   };
 
   return (
@@ -132,12 +188,10 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
           </div>
         ) : (
           <div className="relative">
-            {/* Timeline line */}
             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
             <div className="space-y-6">
               {events.map((event) => (
                 <div key={event.id} className="relative pl-10">
-                  {/* Timeline dot */}
                   <div className="absolute left-2.5 top-1 h-3 w-3 rounded-full bg-primary border-2 border-background" />
                   <div className="p-4 rounded-lg border hover:shadow-soft transition-shadow">
                     <div className="flex items-start justify-between gap-2">
