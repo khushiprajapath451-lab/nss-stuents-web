@@ -34,6 +34,11 @@ interface EligibleEventsClaimProps {
 export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
   const [eligible, setEligible] = useState(getEligibleEventsForVolunteer(user.id));
   const [roles, setRoles] = useState<Record<number, 'participant' | 'organizer'>>({});
+
+  // 60% attendance gate
+  const erpProfile = loadErpProfile(user.id);
+  const attendanceCheck = isAttendanceEligible(erpProfile);
+  const blocked = !attendanceCheck.eligible;
   const [showTutorial, setShowTutorial] = useState(false);
 
   // Show tutorial on first eligible event
