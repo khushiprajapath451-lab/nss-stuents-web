@@ -103,8 +103,22 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
         </DialogContent>
       </Dialog>
 
+      {/* Attendance Gate Warning */}
+      {blocked && (
+        <Card className="border-destructive/30 bg-destructive/5">
+          <CardContent className="flex items-center gap-3 py-4">
+            <XCircle className="h-5 w-5 text-destructive shrink-0" />
+            <div>
+              <p className="font-medium text-destructive text-sm">Event Claiming Blocked</p>
+              <p className="text-xs text-muted-foreground">{attendanceCheck.message}</p>
+              <p className="text-xs text-muted-foreground mt-1">Maintain 60%+ semester attendance to claim events.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Eligible Events to Claim */}
-      <Card className="border-primary/30 bg-primary/5">
+      <Card className={`border-primary/30 bg-primary/5 ${blocked ? 'opacity-50 pointer-events-none' : ''}`}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">

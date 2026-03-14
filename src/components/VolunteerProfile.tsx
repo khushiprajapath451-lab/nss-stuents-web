@@ -24,6 +24,9 @@ export function VolunteerProfile({ user }: VolunteerProfileProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* ERP Profile Sync */}
+      <ErpProfileSync user={user} />
+
       {/* Profile Header */}
       <Card>
         <CardContent className="pt-6">
