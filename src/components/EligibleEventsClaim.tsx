@@ -6,6 +6,7 @@ import {
   attendanceRecords,
   CLAIM_WINDOW_HOURS,
 } from '@/lib/mockData';
+import { loadErpProfile, isAttendanceEligible } from '@/lib/erpSync';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
