@@ -1,1 +1,4 @@
 project_id = "yjydrphxjhfbscxrbsme"
+
+[functions.erp-sync]
+verify_jwt = false
