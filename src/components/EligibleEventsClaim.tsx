@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CheckCircle, Clock, Info, Sparkles } from 'lucide-react';
+import { CheckCircle, Clock, Info, Sparkles, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EligibleEventsClaimProps {

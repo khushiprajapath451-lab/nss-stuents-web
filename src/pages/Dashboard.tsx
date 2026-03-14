@@ -39,7 +39,7 @@ export default function Dashboard({ user }: DashboardProps) {
             <p className="text-muted-foreground mt-1">
               {isHead
                 ? 'Manage volunteers, events, and track performance.'
-                : 'Track your volunteer activities and make a difference.'}
+                : `${user.branch}-${user.section} ${user.semester ? `Sem ${user.semester}` : ''} • Track your volunteer activities and make a difference.`}
             </p>
           </div>
         </div>
