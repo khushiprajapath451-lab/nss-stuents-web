@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ErpProfileSync } from '@/components/ErpProfileSync';
 import {
   User as UserIcon, BookOpen, Clock, Calendar, Award, Trophy, GraduationCap, Hash,
 } from 'lucide-react';
