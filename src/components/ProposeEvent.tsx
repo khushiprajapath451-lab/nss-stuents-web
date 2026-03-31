@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { eventProposals, User } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import {
+  fetchEventProposals, createEventProposal, updateEventProposal,
+  DbEventProposal,
+} from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,85 +10,77 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import { ThumbsUp, Plus, Trophy, Check, Clock, X, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ProposeEventProps {
-  user: User;
+  user: { id: string; name: string; role: string };
 }
 
 export function ProposeEvent({ user }: ProposeEventProps) {
-  const [proposals, setProposals] = useState(() => [...eventProposals]);
+  const [proposals, setProposals] = useState<DbEventProposal[]>([]);
   const [newProposal, setNewProposal] = useState({ title: '', description: '', date: '', location: '', time: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Sync local state with shared store on mount/re-render
-  const syncProposals = (updated: typeof proposals) => {
-    setProposals(updated);
-    // Keep the shared array in sync so other components/users see changes
-    eventProposals.length = 0;
-    updated.forEach((p) => eventProposals.push(p));
-  };
+  useEffect(() => {
+    fetchEventProposals().then(setProposals).catch(() => {});
+  }, []);
 
   const sortedProposals = [...proposals].sort((a, b) => b.votes - a.votes);
-  const topProposal = sortedProposals[0];
 
-  const handleVote = (proposalId: string) => {
-    const updated = proposals.map((p) => {
-      if (p.id === proposalId) {
-        const hasVoted = p.voters.includes(user.id);
-        return {
-          ...p,
-          votes: hasVoted ? p.votes - 1 : p.votes + 1,
-          voters: hasVoted
-            ? p.voters.filter((v) => v !== user.id)
-            : [...p.voters, user.id],
-        };
-      }
-      return p;
+  const handleVote = async (proposalId: string) => {
+    const proposal = proposals.find(p => p.id === proposalId);
+    if (!proposal) return;
+    const hasVoted = proposal.voters.includes(user.id);
+    const newVoters = hasVoted
+      ? proposal.voters.filter(v => v !== user.id)
+      : [...proposal.voters, user.id];
+    await updateEventProposal(proposalId, {
+      votes: newVoters.length,
+      voters: newVoters,
     });
-    syncProposals(updated);
+    setProposals(prev => prev.map(p =>
+      p.id === proposalId ? { ...p, votes: newVoters.length, voters: newVoters } : p
+    ));
   };
 
-  const handleSubmitProposal = () => {
+  const handleSubmitProposal = async () => {
     if (!newProposal.title || !newProposal.description) {
       toast.error('Please fill in title and description');
       return;
     }
-
-    const proposal = {
-      id: String(proposals.length + 1),
-      title: newProposal.title,
-      description: newProposal.description,
-      proposedBy: user.name,
-      proposedDate: newProposal.date,
-      location: newProposal.location,
-      time: newProposal.time,
-      votes: 1,
-      voters: [user.id],
-      status: 'pending' as const,
-    };
-
-    syncProposals([...proposals, proposal]);
-    setNewProposal({ title: '', description: '', date: '', location: '', time: '' });
-    setDialogOpen(false);
-    toast.success('Proposal submitted successfully!');
+    try {
+      const created = await createEventProposal({
+        title: newProposal.title,
+        description: newProposal.description,
+        proposed_by: user.name,
+        proposed_date: newProposal.date || null,
+        location: newProposal.location || null,
+        time: newProposal.time || null,
+        votes: 1,
+        voters: [user.id],
+        status: 'pending',
+      });
+      setProposals(prev => [created, ...prev]);
+      setNewProposal({ title: '', description: '', date: '', location: '', time: '' });
+      setDialogOpen(false);
+      toast.success('Proposal submitted successfully!');
+    } catch {
+      toast.error('Failed to submit proposal');
+    }
   };
 
-  const handleApprove = (proposalId: string) => {
-    syncProposals(proposals.map((p) => (p.id === proposalId ? { ...p, status: 'approved' as const } : p)));
+  const handleApprove = async (proposalId: string) => {
+    await updateEventProposal(proposalId, { status: 'approved' });
+    setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status: 'approved' } : p));
     toast.success('Event approved!');
   };
 
-  const handleReject = (proposalId: string) => {
-    syncProposals(proposals.map((p) => (p.id === proposalId ? { ...p, status: 'rejected' as const } : p)));
+  const handleReject = async (proposalId: string) => {
+    await updateEventProposal(proposalId, { status: 'rejected' });
+    setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status: 'rejected' } : p));
     toast.info('Event rejected');
   };
 
@@ -102,8 +97,6 @@ export function ProposeEvent({ user }: ProposeEventProps) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-
-      {/* Create Proposal Button */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-lg font-semibold">All Proposals</h2>
@@ -119,65 +112,35 @@ export function ProposeEvent({ user }: ProposeEventProps) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Propose a New Event</DialogTitle>
-              <DialogDescription>
-                Submit your event idea for the community to vote on.
-              </DialogDescription>
+              <DialogDescription>Submit your event idea for the community to vote on.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Event Title</Label>
-                <Input
-                  id="title"
-                  placeholder="e.g., Blood Donation Camp"
-                  value={newProposal.title}
-                  onChange={(e) => setNewProposal((p) => ({ ...p, title: e.target.value }))}
-                />
+                <Input id="title" placeholder="e.g., Blood Donation Camp" value={newProposal.title} onChange={(e) => setNewProposal(p => ({ ...p, title: e.target.value }))} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe the event and its objectives..."
-                  value={newProposal.description}
-                  onChange={(e) => setNewProposal((p) => ({ ...p, description: e.target.value }))}
-                />
+                <Textarea id="description" placeholder="Describe the event and its objectives..." value={newProposal.description} onChange={(e) => setNewProposal(p => ({ ...p, description: e.target.value }))} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="date">Proposed Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={newProposal.date}
-                  onChange={(e) => setNewProposal((p) => ({ ...p, date: e.target.value }))}
-                />
+                <Input id="date" type="date" value={newProposal.date} onChange={(e) => setNewProposal(p => ({ ...p, date: e.target.value }))} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="time">Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={newProposal.time}
-                  onChange={(e) => setNewProposal((p) => ({ ...p, time: e.target.value }))}
-                />
+                <Input id="time" type="time" value={newProposal.time} onChange={(e) => setNewProposal(p => ({ ...p, time: e.target.value }))} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g., College Auditorium"
-                  value={newProposal.location}
-                  onChange={(e) => setNewProposal((p) => ({ ...p, location: e.target.value }))}
-                />
+                <Input id="location" placeholder="e.g., College Auditorium" value={newProposal.location} onChange={(e) => setNewProposal(p => ({ ...p, location: e.target.value }))} />
               </div>
-              <Button onClick={handleSubmitProposal} className="w-full">
-                Submit Proposal
-              </Button>
+              <Button onClick={handleSubmitProposal} className="w-full">Submit Proposal</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Proposals List */}
       {sortedProposals.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -200,9 +163,7 @@ export function ProposeEvent({ user }: ProposeEventProps) {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    {index === 0 && proposal.status === 'pending' && (
-                      <span className="text-lg">🏆</span>
-                    )}
+                    {index === 0 && proposal.status === 'pending' && <span className="text-lg">🏆</span>}
                     <CardTitle className="text-base">{proposal.title}</CardTitle>
                   </div>
                   {getStatusBadge(proposal.status)}
@@ -212,8 +173,8 @@ export function ProposeEvent({ user }: ProposeEventProps) {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
-                    <p>By {proposal.proposedBy}</p>
-                    <p>{new Date(proposal.proposedDate).toLocaleDateString()}</p>
+                    <p>By {proposal.proposed_by}</p>
+                    {proposal.proposed_date && <p>{new Date(proposal.proposed_date).toLocaleDateString()}</p>}
                   </div>
                   <div className="flex items-center gap-2">
                     {proposal.status === 'pending' && (
@@ -229,20 +190,10 @@ export function ProposeEvent({ user }: ProposeEventProps) {
                     )}
                     {user.role === 'head' && proposal.status === 'pending' && (
                       <>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-success"
-                          onClick={() => handleApprove(proposal.id)}
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-success" onClick={() => handleApprove(proposal.id)}>
                           <Check className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => handleReject(proposal.id)}
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleReject(proposal.id)}>
                           <X className="h-4 w-4" />
                         </Button>
                       </>

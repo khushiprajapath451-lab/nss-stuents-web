@@ -1,4 +1,5 @@
-import { users } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchProfiles, dbProfileToUser } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -7,12 +8,20 @@ import {
 import { Trophy } from 'lucide-react';
 
 export function VolunteerLeaderboard() {
-  const volunteers = users
-    .filter((u) => u.role === 'volunteer')
-    .sort((a, b) => {
-      if (b.rewardPoints !== a.rewardPoints) return b.rewardPoints - a.rewardPoints;
-      return b.totalHours - a.totalHours;
-    });
+  const [volunteers, setVolunteers] = useState<ReturnType<typeof dbProfileToUser>[]>([]);
+
+  useEffect(() => {
+    fetchProfiles().then(profiles => {
+      const vols = profiles
+        .filter(p => p.role === 'volunteer')
+        .map(dbProfileToUser)
+        .sort((a, b) => {
+          if (b.rewardPoints !== a.rewardPoints) return b.rewardPoints - a.rewardPoints;
+          return b.totalHours - a.totalHours;
+        });
+      setVolunteers(vols);
+    }).catch(() => {});
+  }, []);
 
   const getMedal = (rank: number) => {
     if (rank === 0) return '🥇';

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import { User, certificates as globalCerts, POINTS } from '@/lib/mockData';
-import { saveData, loadData, KEYS, saveUserStats, loadUserStats } from '@/lib/persistence';
+import {
+  fetchPreviousEvents, createPreviousEvent, createCertificate,
+  fetchCertificates, updateProfile, fetchProfile,
+  DbPreviousEvent, DbCertificate, POINTS,
+} from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,114 +16,75 @@ import {
 import { History, Plus, Clock, Calendar, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface PreviousEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  category: string;
-  hours: number;
-  certificateFile?: string;
-}
-
 interface PreviousEventsProps {
-  user: User;
+  user: { id: string; totalHours: number; eventsAttended: number; rewardPoints: number };
 }
 
 export function PreviousEvents({ user }: PreviousEventsProps) {
-  const [events, setEvents] = useState<PreviousEvent[]>(() =>
-    loadData<PreviousEvent[]>(user.id, KEYS.PREVIOUS_EVENTS, [])
-  );
+  const [events, setEvents] = useState<DbPreviousEvent[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({
-    title: '', description: '', date: '', category: '', hours: '',
-  });
-  const [certFile, setCertFile] = useState<File | null>(null);
-  const [certPreview, setCertPreview] = useState<string>('');
+  const [form, setForm] = useState({ title: '', description: '', date: '', category: '', hours: '' });
+  const [certPreview, setCertPreview] = useState('');
 
-  // Restore user stats on mount
   useEffect(() => {
-    const saved = loadUserStats(user.id);
-    if (saved) {
-      user.totalHours = saved.totalHours;
-      user.eventsAttended = saved.eventsAttended;
-      user.rewardPoints = saved.rewardPoints;
-      // Restore certificates
-      if (saved.certificates.length > 0) {
-        user.certificates = saved.certificates;
-        // Also sync global certs array
-        globalCerts.length = 0;
-        globalCerts.push(...saved.certificates);
-      }
-    }
+    fetchPreviousEvents(user.id).then(setEvents).catch(() => {});
   }, [user.id]);
-
-  // Persist events whenever they change
-  useEffect(() => {
-    saveData(user.id, KEYS.PREVIOUS_EVENTS, events);
-  }, [events, user.id]);
 
   const handleCertUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setCertFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setCertPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!form.title || !form.date) {
       toast.error('Please fill in at least title and date.');
       return;
     }
     const hours = parseFloat(form.hours) || 0;
-    const newEvent: PreviousEvent = {
-      id: String(Date.now()),
-      title: form.title,
-      description: form.description,
-      date: form.date,
-      category: form.category || 'General',
-      hours,
-      certificateFile: certPreview || undefined,
-    };
-    const updated = [newEvent, ...events];
-    setEvents(updated);
+    try {
+      const created = await createPreviousEvent({
+        user_id: user.id,
+        title: form.title,
+        description: form.description,
+        date: form.date,
+        category: form.category || 'General',
+        hours,
+        certificate_file: certPreview || null,
+      });
+      await createCertificate({
+        user_id: user.id,
+        event_name: form.title,
+        date: form.date,
+        hours,
+        type: 'participation',
+      });
 
-    // Update user stats
-    user.totalHours += hours;
-    user.eventsAttended += 1;
-    user.rewardPoints += POINTS.EVENT_PARTICIPATION;
+      // Update profile stats in DB
+      const profile = await fetchProfile(user.id);
+      await updateProfile(user.id, {
+        total_hours: Number(profile.total_hours) + hours,
+        events_attended: profile.events_attended + 1,
+        reward_points: profile.reward_points + POINTS.EVENT_PARTICIPATION,
+      });
 
-    // Add certificate for this event
-    const cert = {
-      id: newEvent.id,
-      eventName: newEvent.title,
-      date: newEvent.date,
-      hours,
-      type: 'participation' as const,
-    };
-    if (!user.certificates) user.certificates = [];
-    user.certificates.push(cert);
-    // Sync global certs
-    globalCerts.push(cert);
+      // Update local user object for immediate UI feedback
+      user.totalHours += hours;
+      user.eventsAttended += 1;
+      user.rewardPoints += POINTS.EVENT_PARTICIPATION;
 
-    // Persist stats
-    saveUserStats(user.id, {
-      totalHours: user.totalHours,
-      eventsAttended: user.eventsAttended,
-      rewardPoints: user.rewardPoints,
-      certificates: user.certificates,
-    });
-
-    setForm({ title: '', description: '', date: '', category: '', hours: '' });
-    setCertFile(null);
-    setCertPreview('');
-    setDialogOpen(false);
-    toast.success('Previous event added! Hours, points & certificate updated.');
-    // Notify MyRecord to refresh stats
-    window.dispatchEvent(new Event('yuvaseva-stats-updated'));
+      setEvents(prev => [created, ...prev]);
+      setForm({ title: '', description: '', date: '', category: '', hours: '' });
+      setCertPreview('');
+      setDialogOpen(false);
+      toast.success('Previous event added! Hours, points & certificate updated.');
+      window.dispatchEvent(new Event('yuvaseva-stats-updated'));
+    } catch {
+      toast.error('Failed to add event.');
+    }
   };
 
   return (
@@ -146,30 +110,30 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>Event Title *</Label>
-                  <Input placeholder="e.g., Blood Donation Camp" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} />
+                  <Input placeholder="e.g., Blood Donation Camp" value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
                   <Label>Description</Label>
-                  <Textarea placeholder="Describe your participation..." value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+                  <Textarea placeholder="Describe your participation..." value={form.description} onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>Date *</Label>
-                    <Input type="date" value={form.date} onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))} />
+                    <Input type="date" value={form.date} onChange={(e) => setForm(p => ({ ...p, date: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
                     <Label>Hours Contributed</Label>
-                    <Input type="number" min="0" step="0.5" placeholder="e.g., 4" value={form.hours} onChange={(e) => setForm((p) => ({ ...p, hours: e.target.value }))} />
+                    <Input type="number" min="0" step="0.5" placeholder="e.g., 4" value={form.hours} onChange={(e) => setForm(p => ({ ...p, hours: e.target.value }))} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Category</Label>
-                  <Input placeholder="e.g., Blood Drive, Cleanup" value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} />
+                  <Input placeholder="e.g., Blood Drive, Cleanup" value={form.category} onChange={(e) => setForm(p => ({ ...p, category: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
                   <Label>Upload Certificate (optional)</Label>
                   <Input type="file" accept="image/*,.pdf" onChange={handleCertUpload} />
-                  {certPreview && certFile?.type.startsWith('image/') && (
+                  {certPreview && certPreview.startsWith('data:image') && (
                     <img src={certPreview} alt="Certificate" className="h-20 rounded-md object-cover mt-2" />
                   )}
                 </div>
@@ -202,7 +166,7 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
                             <Calendar className="h-3 w-3" />
                             {new Date(event.date).toLocaleDateString()}
                           </span>
-                          {event.hours > 0 && (
+                          {Number(event.hours) > 0 && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               {event.hours}h
@@ -215,7 +179,7 @@ export function PreviousEvents({ user }: PreviousEventsProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="capitalize">{event.category}</Badge>
-                        {event.certificateFile && (
+                        {event.certificate_file && (
                           <Badge className="bg-success/10 text-success border-0">
                             <FileText className="h-3 w-3 mr-1" />
                             Cert
