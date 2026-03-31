@@ -1,47 +1,52 @@
 import { useState, useEffect } from 'react';
 import {
-  User,
-  getEligibleEventsForVolunteer,
-  claimEvent,
-  attendanceRecords,
-  CLAIM_WINDOW_HOURS,
-} from '@/lib/mockData';
+  fetchAttendanceRecords, updateAttendanceRecord,
+  DbAttendanceRecord, CLAIM_WINDOW_HOURS, POINTS,
+} from '@/lib/supabaseData';
 import { loadErpProfile, isAttendanceEligible } from '@/lib/erpSync';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { CheckCircle, Clock, Info, Sparkles, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { updateProfile, fetchProfile } from '@/lib/supabaseData';
 
 interface EligibleEventsClaimProps {
-  user: User;
+  user: { id: string; rewardPoints: number };
 }
 
 export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
-  const [eligible, setEligible] = useState(getEligibleEventsForVolunteer(user.id));
-  const [roles, setRoles] = useState<Record<number, 'participant' | 'organizer'>>({});
+  const [allRecords, setAllRecords] = useState<DbAttendanceRecord[]>([]);
+  const [roles, setRoles] = useState<Record<string, 'participant' | 'organizer'>>({});
+  const [showTutorial, setShowTutorial] = useState(false);
 
-  // 60% attendance gate
   const erpProfile = loadErpProfile(user.id);
   const attendanceCheck = isAttendanceEligible(erpProfile);
   const blocked = !attendanceCheck.eligible;
-  const [showTutorial, setShowTutorial] = useState(false);
 
-  // Show tutorial on first eligible event
+  useEffect(() => {
+    fetchAttendanceRecords().then(setAllRecords).catch(() => {});
+  }, []);
+
+  const eligible = allRecords.filter(r => {
+    if (!r.present_volunteer_ids.includes(user.id)) return false;
+    const cb = r.claimed_by as Record<string, any>;
+    if (cb[user.id]) return false;
+    const markedTime = new Date(r.marked_at).getTime();
+    return Date.now() - markedTime < CLAIM_WINDOW_HOURS * 60 * 60 * 1000;
+  });
+
+  const claimed = allRecords.filter(r => {
+    const cb = r.claimed_by as Record<string, any>;
+    return cb[user.id];
+  });
+
   useEffect(() => {
     if (eligible.length > 0) {
       const tutorialSeen = sessionStorage.getItem('nss_claim_tutorial_seen');
@@ -52,26 +57,26 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
     }
   }, [eligible.length]);
 
-  const refreshEligible = () => {
-    setEligible(getEligibleEventsForVolunteer(user.id));
-  };
+  const handleClaim = async (record: DbAttendanceRecord) => {
+    const role = roles[record.id] || 'participant';
+    const newClaimedBy = {
+      ...(record.claimed_by as Record<string, any>),
+      [user.id]: { role, claimedAt: new Date().toISOString() },
+    };
+    await updateAttendanceRecord(record.id, { claimed_by: newClaimedBy as any });
 
-  const handleClaim = (recordIndex: number) => {
-    const role = roles[recordIndex] || 'participant';
-    claimEvent(recordIndex, user.id, role);
+    // Award points
+    const pts = role === 'organizer' ? POINTS.EVENT_ORGANIZING : POINTS.EVENT_PARTICIPATION;
+    const profile = await fetchProfile(user.id);
+    await updateProfile(user.id, { reward_points: profile.reward_points + pts });
+    user.rewardPoints += pts;
+
     toast.success(`Event claimed as ${role}! Hours will be calculated automatically.`);
-    refreshEligible();
+    fetchAttendanceRecords().then(setAllRecords).catch(() => {});
   };
-
-  const getRecordIndex = (record: typeof attendanceRecords[0]) =>
-    attendanceRecords.indexOf(record);
-
-  // Claimed events for display
-  const claimed = attendanceRecords.filter((r) => r.claimedBy[user.id]);
 
   return (
     <>
-      {/* Tutorial Popup */}
       <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
         <DialogContent>
           <DialogHeader>
@@ -103,7 +108,6 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Attendance Gate Warning */}
       {blocked && (
         <Card className="border-destructive/30 bg-destructive/5">
           <CardContent className="flex items-center gap-3 py-4">
@@ -117,7 +121,6 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
         </Card>
       )}
 
-      {/* Eligible Events to Claim */}
       <Card className={`border-primary/30 bg-primary/5 ${blocked ? 'opacity-50 pointer-events-none' : ''}`}>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -125,7 +128,7 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
               <CheckCircle className="h-5 w-5 text-primary" />
               Eligible Events — Claim Now
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={refreshEligible}>
+            <Button variant="ghost" size="sm" onClick={() => fetchAttendanceRecords().then(setAllRecords)}>
               Refresh
             </Button>
           </div>
@@ -141,16 +144,11 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
           ) : (
             <div className="space-y-3">
               {eligible.map((record) => {
-                const idx = getRecordIndex(record);
-                const markedTime = new Date(record.markedAt);
-                const expiresAt = new Date(markedTime.getTime() + CLAIM_WINDOW_HOURS * 60 * 60 * 1000);
+                const expiresAt = new Date(new Date(record.marked_at).getTime() + CLAIM_WINDOW_HOURS * 60 * 60 * 1000);
                 return (
-                  <div
-                    key={record.eventId + record.markedAt}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border bg-background"
-                  >
+                  <div key={record.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border bg-background">
                     <div>
-                      <p className="font-medium">{record.eventTitle}</p>
+                      <p className="font-medium">{record.event_title}</p>
                       <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         Expires: {expiresAt.toLocaleString()}
@@ -158,20 +156,16 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
                     </div>
                     <div className="flex items-center gap-2">
                       <Select
-                        value={roles[idx] || 'participant'}
-                        onValueChange={(v) =>
-                          setRoles((prev) => ({ ...prev, [idx]: v as 'participant' | 'organizer' }))
-                        }
+                        value={roles[record.id] || 'participant'}
+                        onValueChange={(v) => setRoles(prev => ({ ...prev, [record.id]: v as 'participant' | 'organizer' }))}
                       >
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="participant">Participant</SelectItem>
                           <SelectItem value="organizer">Organizer</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button size="sm" onClick={() => handleClaim(idx)} className="shadow-glow">
+                      <Button size="sm" onClick={() => handleClaim(record)} className="shadow-glow">
                         Claim
                       </Button>
                     </div>
@@ -183,7 +177,6 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
         </CardContent>
       </Card>
 
-      {/* Already Claimed Events */}
       {claimed.length > 0 && (
         <Card>
           <CardHeader>
@@ -192,21 +185,15 @@ export function EligibleEventsClaim({ user }: EligibleEventsClaimProps) {
           <CardContent>
             <div className="space-y-2">
               {claimed.map((r) => {
-                const claim = r.claimedBy[user.id];
+                const cb = r.claimed_by as Record<string, any>;
+                const claim = cb[user.id];
                 return (
-                  <div
-                    key={r.eventId + r.markedAt}
-                    className="flex items-center justify-between p-3 rounded-lg border"
-                  >
+                  <div key={r.id} className="flex items-center justify-between p-3 rounded-lg border">
                     <div>
-                      <p className="font-medium text-sm">{r.eventTitle}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(r.eventDate).toLocaleDateString()}
-                      </p>
+                      <p className="font-medium text-sm">{r.event_title}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(r.event_date).toLocaleDateString()}</p>
                     </div>
-                    <Badge className="bg-primary/20 text-primary border-0 capitalize">
-                      {claim.role}
-                    </Badge>
+                    <Badge className="bg-primary/20 text-primary border-0 capitalize">{claim?.role}</Badge>
                   </div>
                 );
               })}

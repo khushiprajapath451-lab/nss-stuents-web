@@ -1,4 +1,3 @@
-import { User } from '@/lib/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MyRecord } from '@/components/MyRecord';
 import { ProposeEvent } from '@/components/ProposeEvent';
@@ -8,21 +7,21 @@ import { VolunteerProfile } from '@/components/VolunteerProfile';
 import { InviteVolunteers } from '@/components/InviteVolunteers';
 import { User as UserIcon, Lightbulb, Calendar, Crown, Shield, IdCard, Link2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import type { User } from '@/App';
+import type { DbProfile } from '@/lib/supabaseData';
 
 interface DashboardProps {
   user: User;
+  dbProfile: DbProfile;
 }
 
-export default function Dashboard({ user }: DashboardProps) {
+export default function Dashboard({ user, dbProfile }: DashboardProps) {
   const isHead = user.role === 'head';
-
-  // Tabs config: head gets no "My Record", volunteers get no "Admin"
   const defaultTab = isHead ? 'propose' : 'record';
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-6 space-y-6">
-        {/* Welcome Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -44,7 +43,6 @@ export default function Dashboard({ user }: DashboardProps) {
           </div>
         </div>
 
-        {/* Dashboard Tabs */}
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-5'}`}>
             {!isHead && (

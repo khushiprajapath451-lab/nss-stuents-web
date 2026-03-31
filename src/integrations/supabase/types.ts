@@ -14,7 +14,312 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_records: {
+        Row: {
+          claimed_by: Json | null
+          event_date: string
+          event_id: string
+          event_title: string
+          id: string
+          marked_at: string | null
+          present_volunteer_ids: string[] | null
+        }
+        Insert: {
+          claimed_by?: Json | null
+          event_date: string
+          event_id: string
+          event_title: string
+          id?: string
+          marked_at?: string | null
+          present_volunteer_ids?: string[] | null
+        }
+        Update: {
+          claimed_by?: Json | null
+          event_date?: string
+          event_id?: string
+          event_title?: string
+          id?: string
+          marked_at?: string | null
+          present_volunteer_ids?: string[] | null
+        }
+        Relationships: []
+      }
+      certificates: {
+        Row: {
+          date: string
+          event_name: string
+          hours: number | null
+          id: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          date: string
+          event_name: string
+          hours?: number | null
+          id?: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          date?: string
+          event_name?: string
+          hours?: number | null
+          id?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      event_proposals: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          location: string | null
+          proposed_by: string
+          proposed_date: string | null
+          status: string | null
+          time: string | null
+          title: string
+          voters: string[] | null
+          votes: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          location?: string | null
+          proposed_by: string
+          proposed_date?: string | null
+          status?: string | null
+          time?: string | null
+          title: string
+          voters?: string[] | null
+          votes?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          location?: string | null
+          proposed_by?: string
+          proposed_date?: string | null
+          status?: string | null
+          time?: string | null
+          title?: string
+          voters?: string[] | null
+          votes?: number | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          id: string
+          message: string
+          read: boolean | null
+          timestamp: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          message: string
+          read?: boolean | null
+          timestamp?: string | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          message?: string
+          read?: boolean | null
+          timestamp?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      previous_events: {
+        Row: {
+          category: string | null
+          certificate_file: string | null
+          created_at: string | null
+          date: string
+          description: string | null
+          hours: number | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          certificate_file?: string | null
+          created_at?: string | null
+          date: string
+          description?: string | null
+          hours?: number | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          certificate_file?: string | null
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          hours?: number | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          activities_completed: number | null
+          avatar: string | null
+          badges: string[] | null
+          branch: string | null
+          created_at: string | null
+          events_attended: number | null
+          id: string
+          inactive_warnings: number | null
+          is_inactive: boolean | null
+          last_activity_date: string | null
+          name: string
+          reward_points: number | null
+          role: string
+          roll_number: string
+          section: string | null
+          semester: number | null
+          total_hours: number | null
+        }
+        Insert: {
+          activities_completed?: number | null
+          avatar?: string | null
+          badges?: string[] | null
+          branch?: string | null
+          created_at?: string | null
+          events_attended?: number | null
+          id: string
+          inactive_warnings?: number | null
+          is_inactive?: boolean | null
+          last_activity_date?: string | null
+          name: string
+          reward_points?: number | null
+          role?: string
+          roll_number: string
+          section?: string | null
+          semester?: number | null
+          total_hours?: number | null
+        }
+        Update: {
+          activities_completed?: number | null
+          avatar?: string | null
+          badges?: string[] | null
+          branch?: string | null
+          created_at?: string | null
+          events_attended?: number | null
+          id?: string
+          inactive_warnings?: number | null
+          is_inactive?: boolean | null
+          last_activity_date?: string | null
+          name?: string
+          reward_points?: number | null
+          role?: string
+          roll_number?: string
+          section?: string | null
+          semester?: number | null
+          total_hours?: number | null
+        }
+        Relationships: []
+      }
+      service_posts: {
+        Row: {
+          date: string
+          description: string
+          id: string
+          photos: string[] | null
+          points_awarded: number | null
+          posted_at: string | null
+          status: string | null
+          title: string
+          volunteer_id: string
+          volunteer_name: string
+        }
+        Insert: {
+          date: string
+          description: string
+          id?: string
+          photos?: string[] | null
+          points_awarded?: number | null
+          posted_at?: string | null
+          status?: string | null
+          title: string
+          volunteer_id: string
+          volunteer_name: string
+        }
+        Update: {
+          date?: string
+          description?: string
+          id?: string
+          photos?: string[] | null
+          points_awarded?: number | null
+          posted_at?: string | null
+          status?: string | null
+          title?: string
+          volunteer_id?: string
+          volunteer_name?: string
+        }
+        Relationships: []
+      }
+      urgent_alerts: {
+        Row: {
+          blood_group: string | null
+          category: string | null
+          contact: string | null
+          description: string
+          help_type: string | null
+          id: string
+          location: string | null
+          person_in_need: string | null
+          posted_at: string | null
+          title: string
+          urgency_level: string | null
+        }
+        Insert: {
+          blood_group?: string | null
+          category?: string | null
+          contact?: string | null
+          description: string
+          help_type?: string | null
+          id?: string
+          location?: string | null
+          person_in_need?: string | null
+          posted_at?: string | null
+          title: string
+          urgency_level?: string | null
+        }
+        Update: {
+          blood_group?: string | null
+          category?: string | null
+          contact?: string | null
+          description?: string
+          help_type?: string | null
+          id?: string
+          location?: string | null
+          person_in_need?: string | null
+          posted_at?: string | null
+          title?: string
+          urgency_level?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

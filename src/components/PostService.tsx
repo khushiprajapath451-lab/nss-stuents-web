@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { User, servicePosts, addNotification } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import {
+  fetchServicePosts, createServicePost, createNotification,
+  DbServicePost,
+} from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,49 +16,51 @@ import { Heart, Plus, Clock, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PostServiceProps {
-  user: User;
+  user: { id: string; name: string };
 }
 
 export function PostService({ user }: PostServiceProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [, forceUpdate] = useState(0);
-  const [newPost, setNewPost] = useState({
-    title: '', description: '', date: '',
-  });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [myPosts, setMyPosts] = useState<DbServicePost[]>([]);
+  const [newPost, setNewPost] = useState({ title: '', description: '', date: '' });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const myPosts = servicePosts.filter((s) => s.volunteerId === user.id);
+  useEffect(() => {
+    fetchServicePosts().then(all => {
+      setMyPosts(all.filter(s => s.volunteer_id === user.id));
+    }).catch(() => {});
+  }, [user.id]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!newPost.title || !newPost.description || !newPost.date) {
       toast.error('Please fill in title, description, and date.');
       return;
     }
-    servicePosts.push({
-      id: String(Date.now()),
-      volunteerId: user.id,
-      volunteerName: user.name,
-      title: newPost.title,
-      description: newPost.description,
-      date: newPost.date,
-      photos: photoPreview ? [photoPreview] : [],
-      status: 'pending',
-      postedAt: new Date().toISOString(),
-      pointsAwarded: 0,
-    });
-    addNotification({
-      type: 'service',
-      title: 'Service Post Submitted',
-      message: `"${newPost.title}" is pending admin approval.`,
-      userId: user.id,
-    });
-    setNewPost({ title: '', description: '', date: '' });
-    setPhotoFile(null);
-    setPhotoPreview(null);
-    setDialogOpen(false);
-    toast.success('Service post submitted! Awaiting admin approval.');
-    forceUpdate((n) => n + 1);
+    try {
+      const created = await createServicePost({
+        volunteer_id: user.id,
+        volunteer_name: user.name,
+        title: newPost.title,
+        description: newPost.description,
+        date: newPost.date,
+        photos: photoPreview ? [photoPreview] : [],
+        status: 'pending',
+        points_awarded: 0,
+      });
+      await createNotification({
+        type: 'service',
+        title: 'Service Post Submitted',
+        message: `"${newPost.title}" is pending admin approval.`,
+        user_id: user.id,
+      });
+      setMyPosts(prev => [created, ...prev]);
+      setNewPost({ title: '', description: '', date: '' });
+      setPhotoPreview(null);
+      setDialogOpen(false);
+      toast.success('Service post submitted! Awaiting admin approval.');
+    } catch {
+      toast.error('Failed to submit service post.');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -91,15 +96,15 @@ export function PostService({ user }: PostServiceProps) {
               <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
                   <Label>Service Title</Label>
-                  <Input placeholder="e.g., Tree Planting Drive" value={newPost.title} onChange={(e) => setNewPost((p) => ({ ...p, title: e.target.value }))} />
+                  <Input placeholder="e.g., Tree Planting Drive" value={newPost.title} onChange={(e) => setNewPost(p => ({ ...p, title: e.target.value }))} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Description</Label>
-                  <Textarea placeholder="Describe what you did..." value={newPost.description} onChange={(e) => setNewPost((p) => ({ ...p, description: e.target.value }))} />
+                  <Textarea placeholder="Describe what you did..." value={newPost.description} onChange={(e) => setNewPost(p => ({ ...p, description: e.target.value }))} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Date of Service</Label>
-                  <Input type="date" value={newPost.date} onChange={(e) => setNewPost((p) => ({ ...p, date: e.target.value }))} />
+                  <Input type="date" value={newPost.date} onChange={(e) => setNewPost(p => ({ ...p, date: e.target.value }))} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Photo (optional)</Label>
@@ -109,7 +114,6 @@ export function PostService({ user }: PostServiceProps) {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        setPhotoFile(file);
                         const reader = new FileReader();
                         reader.onloadend = () => setPhotoPreview(reader.result as string);
                         reader.readAsDataURL(file);
@@ -136,8 +140,8 @@ export function PostService({ user }: PostServiceProps) {
                   <p className="text-xs text-muted-foreground">{new Date(post.date).toLocaleDateString()}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {post.pointsAwarded > 0 && (
-                    <Badge className="bg-warning/10 text-warning border-0 text-xs">+{post.pointsAwarded} pts</Badge>
+                  {post.points_awarded > 0 && (
+                    <Badge className="bg-warning/10 text-warning border-0 text-xs">+{post.points_awarded} pts</Badge>
                   )}
                   {getStatusBadge(post.status)}
                 </div>

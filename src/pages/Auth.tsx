@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { authenticateUser } from '@/lib/mockData';
+import { authenticateUser, DbProfile } from '@/lib/supabaseData';
 import { toast } from 'sonner';
 
 interface AuthProps {
-  onLogin: (user: typeof import('@/lib/mockData').users[0]) => void;
+  onLogin: (profile: DbProfile) => void;
 }
 
 export default function Auth({ onLogin }: AuthProps) {
@@ -23,16 +23,17 @@ export default function Auth({ onLogin }: AuthProps) {
     e.preventDefault();
     setIsLoading(true);
 
-    await new Promise((r) => setTimeout(r, 600));
-
-    const user = authenticateUser(rollNumber, password);
-
-    if (user) {
-      onLogin(user);
-      toast.success(`Welcome, ${user.name}!`);
-      navigate('/dashboard');
-    } else {
-      toast.error('Invalid roll number or password');
+    try {
+      const profile = await authenticateUser(rollNumber, password);
+      if (profile) {
+        onLogin(profile);
+        toast.success(`Welcome, ${profile.name}!`);
+        navigate('/dashboard');
+      } else {
+        toast.error('Invalid roll number or password');
+      }
+    } catch {
+      toast.error('Login failed. Please try again.');
     }
 
     setIsLoading(false);
@@ -63,7 +64,6 @@ export default function Auth({ onLogin }: AuthProps) {
                 placeholder="e.g. 24881A05AG or NSRINIVAS"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
-                className=""
                 required
               />
             </div>

@@ -1,12 +1,19 @@
-import { urgentPosts } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchUrgentAlerts, DbUrgentAlert } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, Phone, MapPin, Droplets, ChevronRight, HandHelping } from 'lucide-react';
+import { AlertTriangle, Clock, Phone, MapPin, Droplets, HandHelping } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 export function UrgentPosts() {
+  const [alerts, setAlerts] = useState<DbUrgentAlert[]>([]);
+
+  useEffect(() => {
+    fetchUrgentAlerts().then(setAlerts).catch(() => {});
+  }, []);
+
   const getUrgencyStyles = (level: string) => {
     switch (level) {
       case 'critical':
@@ -18,7 +25,7 @@ export function UrgentPosts() {
     }
   };
 
-  if (urgentPosts.length === 0) {
+  if (alerts.length === 0) {
     return (
       <section className="py-8">
         <div className="flex items-center gap-3 mb-6">
@@ -52,26 +59,26 @@ export function UrgentPosts() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {urgentPosts.map((post, index) => (
+        {alerts.map((post, index) => (
           <Card
             key={post.id}
             className={`group relative overflow-hidden transition-all duration-300 hover:shadow-elevated ${
-              post.urgencyLevel === 'critical' ? 'ring-2 ring-urgent/50' : ''
+              post.urgency_level === 'critical' ? 'ring-2 ring-urgent/50' : ''
             }`}
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            {post.urgencyLevel === 'critical' && (
+            {post.urgency_level === 'critical' && (
               <div className="absolute inset-0 bg-gradient-to-br from-urgent/5 to-transparent pointer-events-none" />
             )}
             
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
-                <Badge className={getUrgencyStyles(post.urgencyLevel)}>
-                  {post.urgencyLevel.toUpperCase()}
+                <Badge className={getUrgencyStyles(post.urgency_level)}>
+                  {post.urgency_level.toUpperCase()}
                 </Badge>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {formatDistanceToNow(new Date(post.postedAt), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(post.posted_at), { addSuffix: true })}
                 </span>
               </div>
               <CardTitle className="text-lg mt-2 group-hover:text-primary transition-colors">
@@ -83,13 +90,11 @@ export function UrgentPosts() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {post.description}
               </p>
-
-              {/* Details */}
               <div className="space-y-1.5 text-sm">
-                {post.personInNeed && (
+                {post.person_in_need && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <HandHelping className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{post.personInNeed}</span>
+                    <span className="truncate">{post.person_in_need}</span>
                   </div>
                 )}
                 {post.location && (
@@ -98,16 +103,16 @@ export function UrgentPosts() {
                     <span className="truncate">{post.location}</span>
                   </div>
                 )}
-                {post.bloodGroup && (
+                {post.blood_group && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Droplets className="h-3.5 w-3.5 shrink-0 text-urgent" />
-                    <span>Blood Group: <strong>{post.bloodGroup}</strong></span>
+                    <span>Blood Group: <strong>{post.blood_group}</strong></span>
                   </div>
                 )}
-                {post.helpType && (
+                {post.help_type && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                    <span>{post.helpType}</span>
+                    <span>{post.help_type}</span>
                   </div>
                 )}
               </div>

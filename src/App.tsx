@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -10,19 +10,25 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import InviteLanding from './pages/InviteLanding';
 import NotFound from './pages/NotFound';
-import { User } from '@/lib/mockData';
+import { DbProfile, dbProfileToUser } from '@/lib/supabaseData';
 
 const queryClient = new QueryClient();
 
+// Legacy User type for components
+export type User = ReturnType<typeof dbProfileToUser>;
+
 const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [dbProfile, setDbProfile] = useState<DbProfile | null>(null);
 
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
+  const handleLogin = (profile: DbProfile) => {
+    setDbProfile(profile);
+    setCurrentUser(dbProfileToUser(profile));
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setDbProfile(null);
   };
 
   return (
@@ -47,7 +53,7 @@ const App = () => {
               path="/dashboard"
               element={
                 currentUser ? (
-                  <Dashboard user={currentUser} />
+                  <Dashboard user={currentUser} dbProfile={dbProfile!} />
                 ) : (
                   <Navigate to="/auth" replace />
                 )

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import { User, certificates as globalCerts, events, badgeInfo, attendanceRecords, CLAIM_WINDOW_HOURS } from '@/lib/mockData';
-import { loadUserStats } from '@/lib/persistence';
+import {
+  fetchAttendanceRecords, fetchCertificates, fetchProfile,
+  DbAttendanceRecord, DbCertificate, badgeInfo,
+  CLAIM_WINDOW_HOURS, NSS_HOURS_GOAL,
+} from '@/lib/supabaseData';
 import { EligibleEventsClaim } from '@/components/EligibleEventsClaim';
 import { PostService } from '@/components/PostService';
 import { RewardCard } from '@/components/RewardCard';
@@ -27,50 +30,51 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { toast } from 'sonner';
 
 interface MyRecordProps {
-  user: User;
+  user: any;
 }
 
 interface UserEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  category: string;
+  id: string; title: string; description: string; date: string; category: string;
 }
 
 export function MyRecord({ user }: MyRecordProps) {
   const [addedEvents, setAddedEvents] = useState<UserEvent[]>([]);
   const [newEvent, setNewEvent] = useState({ title: '', description: '', date: '', category: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
-  // Force re-render when stats change (after PreviousEvents updates user object)
   const [, refresh] = useState(0);
+  const [attendanceRecords, setAttendanceRecords] = useState<DbAttendanceRecord[]>([]);
+  const [userCerts, setUserCerts] = useState<DbCertificate[]>([]);
 
-  // Restore persisted stats on mount
+  // Load data from DB
   useEffect(() => {
-    const saved = loadUserStats(user.id);
-    if (saved) {
-      user.totalHours = saved.totalHours;
-      user.eventsAttended = saved.eventsAttended;
-      user.rewardPoints = saved.rewardPoints;
-      if (saved.certificates.length > 0) {
-        user.certificates = saved.certificates;
-        globalCerts.length = 0;
-        globalCerts.push(...saved.certificates);
-      }
+    fetchAttendanceRecords().then(setAttendanceRecords).catch(() => {});
+    fetchCertificates(user.id).then(setUserCerts).catch(() => {});
+    // Refresh profile stats from DB
+    fetchProfile(user.id).then(profile => {
+      user.totalHours = Number(profile.total_hours);
+      user.eventsAttended = profile.events_attended;
+      user.rewardPoints = profile.reward_points;
       refresh(n => n + 1);
-    }
+    }).catch(() => {});
   }, [user.id]);
 
-  // Listen for storage updates from PreviousEvents
   useEffect(() => {
-    const handler = () => refresh(n => n + 1);
+    const handler = () => {
+      fetchProfile(user.id).then(profile => {
+        user.totalHours = Number(profile.total_hours);
+        user.eventsAttended = profile.events_attended;
+        user.rewardPoints = profile.reward_points;
+        refresh(n => n + 1);
+      }).catch(() => {});
+      fetchCertificates(user.id).then(setUserCerts).catch(() => {});
+    };
     window.addEventListener('yuvaseva-stats-updated', handler);
     return () => window.removeEventListener('yuvaseva-stats-updated', handler);
-  }, []);
+  }, [user.id]);
 
   const hasAttendanceMarked = attendanceRecords.some((r) => {
-    if (!r.presentVolunteerIds.includes(user.id)) return false;
-    const markedTime = new Date(r.markedAt).getTime();
+    if (!r.present_volunteer_ids.includes(user.id)) return false;
+    const markedTime = new Date(r.marked_at).getTime();
     return Date.now() - markedTime < CLAIM_WINDOW_HOURS * 60 * 60 * 1000;
   });
 
@@ -86,17 +90,13 @@ export function MyRecord({ user }: MyRecordProps) {
       date: newEvent.date,
       category: newEvent.category || 'General',
     };
-    setAddedEvents((prev) => [...prev, event]);
+    setAddedEvents(prev => [...prev, event]);
     setNewEvent({ title: '', description: '', date: '', category: '' });
     setDialogOpen(false);
     toast.success('Event added to your record!');
   };
 
-  const userEvents = user.eventsAttended > 0
-    ? events.filter((e) => e.status === 'completed').slice(0, user.eventsAttended)
-    : [];
   const progressToNextBadge = Math.min((user.totalHours / 50) * 100, 100);
-  const userCerts = user.certificates ?? globalCerts;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -154,19 +154,19 @@ export function MyRecord({ user }: MyRecordProps) {
                 <div className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="event-title">Event Title</Label>
-                    <Input id="event-title" placeholder="e.g., Blood Donation Camp" value={newEvent.title} onChange={(e) => setNewEvent((p) => ({ ...p, title: e.target.value }))} />
+                    <Input id="event-title" placeholder="e.g., Blood Donation Camp" value={newEvent.title} onChange={(e) => setNewEvent(p => ({ ...p, title: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="event-desc">Description</Label>
-                    <Textarea id="event-desc" placeholder="Describe your participation and contributions..." value={newEvent.description} onChange={(e) => setNewEvent((p) => ({ ...p, description: e.target.value }))} />
+                    <Textarea id="event-desc" placeholder="Describe your participation..." value={newEvent.description} onChange={(e) => setNewEvent(p => ({ ...p, description: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="event-date">Event Date</Label>
-                    <Input id="event-date" type="date" value={newEvent.date} onChange={(e) => setNewEvent((p) => ({ ...p, date: e.target.value }))} />
+                    <Input id="event-date" type="date" value={newEvent.date} onChange={(e) => setNewEvent(p => ({ ...p, date: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="event-category">Category</Label>
-                    <Input id="event-category" placeholder="e.g., Blood Drive, Cleanup, Workshop" value={newEvent.category} onChange={(e) => setNewEvent((p) => ({ ...p, category: e.target.value }))} />
+                    <Input id="event-category" placeholder="e.g., Blood Drive, Cleanup, Workshop" value={newEvent.category} onChange={(e) => setNewEvent(p => ({ ...p, category: e.target.value }))} />
                   </div>
                   <Button onClick={handleAddEvent} className="w-full">Add to Record</Button>
                 </div>
@@ -309,36 +309,6 @@ export function MyRecord({ user }: MyRecordProps) {
       <SocialInternship user={user} />
       <PreviousEvents user={user} />
 
-      {/* Events History */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Recent Events</CardTitle>
-          <Button variant="outline" size="sm">View All</Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Event</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {userEvents.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.title}</TableCell>
-                  <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
-                  <TableCell><Badge variant="outline" className="capitalize">{event.category.replace('_', ' ')}</Badge></TableCell>
-                  <TableCell><Badge variant="secondary" className="bg-success/10 text-success">Attended</Badge></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
       {/* Certificates */}
       <Card>
         <CardHeader>
@@ -358,7 +328,7 @@ export function MyRecord({ user }: MyRecordProps) {
             <TableBody>
               {userCerts.map((cert) => (
                 <TableRow key={cert.id}>
-                  <TableCell className="font-medium">{cert.eventName}</TableCell>
+                  <TableCell className="font-medium">{cert.event_name}</TableCell>
                   <TableCell>{new Date(cert.date).toLocaleDateString()}</TableCell>
                   <TableCell>{cert.hours}h</TableCell>
                   <TableCell><Badge variant={cert.type === 'excellence' ? 'default' : 'outline'} className="capitalize">{cert.type}</Badge></TableCell>

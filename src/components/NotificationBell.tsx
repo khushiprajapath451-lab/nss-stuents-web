@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { notifications } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchNotifications, markNotificationsRead, DbNotification } from '@/lib/supabaseData';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,13 +12,20 @@ import { formatDistanceToNow } from 'date-fns';
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const [notifs, setNotifs] = useState<DbNotification[]>([]);
+
+  useEffect(() => {
+    fetchNotifications().then(setNotifs).catch(() => {});
+  }, []);
+
+  const unreadCount = notifs.filter((n) => !n.read).length;
 
   const handleOpen = (isOpen: boolean) => {
     setOpen(isOpen);
-    if (isOpen) {
-      // Mark all as read
-      notifications.forEach((n) => (n.read = true));
+    if (isOpen && unreadCount > 0) {
+      markNotificationsRead().then(() => {
+        setNotifs((prev) => prev.map((n) => ({ ...n, read: true })));
+      });
     }
   };
 
@@ -49,10 +56,10 @@ export function NotificationBell() {
           <h3 className="font-semibold text-sm">Notifications</h3>
         </div>
         <div className="max-h-80 overflow-y-auto">
-          {notifications.length === 0 ? (
+          {notifs.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">No notifications yet</p>
           ) : (
-            notifications.slice(0, 20).map((n) => (
+            notifs.slice(0, 20).map((n) => (
               <div key={n.id} className="flex items-start gap-3 p-3 border-b border-border/50 hover:bg-muted/50 transition-colors">
                 {getIcon(n.type)}
                 <div className="flex-1 min-w-0">
