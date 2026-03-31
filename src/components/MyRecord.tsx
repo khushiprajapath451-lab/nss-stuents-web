@@ -30,11 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { toast } from 'sonner';
 
 interface MyRecordProps {
-  user: {
-    id: string; name: string; role: string; totalHours: number;
-    eventsAttended: number; rewardPoints: number; badges: string[];
-    isInactive: boolean; certificates?: any[];
-  };
+  user: any;
 }
 
 interface UserEvent {
