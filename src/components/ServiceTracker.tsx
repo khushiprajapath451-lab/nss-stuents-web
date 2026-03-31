@@ -1,11 +1,11 @@
-import { User, NSS_HOURS_GOAL } from '@/lib/mockData';
+import { NSS_HOURS_GOAL } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle, Target } from 'lucide-react';
 
 interface ServiceTrackerProps {
-  user: User;
+  user: { totalHours: number };
 }
 
 export function ServiceTracker({ user }: ServiceTrackerProps) {

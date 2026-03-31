@@ -1,11 +1,11 @@
-import { User, rewardMilestones } from '@/lib/mockData';
+import { rewardMilestones } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Gift, Star } from 'lucide-react';
+import { Gift } from 'lucide-react';
 
 interface RewardCardProps {
-  user: User;
+  user: { rewardPoints: number };
 }
 
 export function RewardCard({ user }: RewardCardProps) {
