@@ -1,4 +1,5 @@
-import { eventProposals } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchEventProposals, DbEventProposal } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,8 +7,13 @@ import { Calendar, Clock, MapPin, User, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function HomeEvents() {
-  // Show approved + pending proposals
-  const visibleEvents = eventProposals.filter((p) => p.status !== 'rejected');
+  const [proposals, setProposals] = useState<DbEventProposal[]>([]);
+
+  useEffect(() => {
+    fetchEventProposals().then(setProposals).catch(() => {});
+  }, []);
+
+  const visibleEvents = proposals.filter((p) => p.status !== 'rejected');
 
   if (visibleEvents.length === 0) {
     return (
@@ -80,12 +86,14 @@ export function HomeEvents() {
                 {event.description}
               </p>
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {new Date(event.proposedDate).toLocaleDateString('en-IN', {
-                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-                  })}
-                </div>
+                {event.proposed_date && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {new Date(event.proposed_date).toLocaleDateString('en-IN', {
+                      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+                    })}
+                  </div>
+                )}
                 {event.time && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
@@ -100,7 +108,7 @@ export function HomeEvents() {
                 )}
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <User className="h-3.5 w-3.5" />
-                  {event.proposedBy}
+                  {event.proposed_by}
                 </div>
               </div>
               <div className="pt-2 border-t border-border/50">

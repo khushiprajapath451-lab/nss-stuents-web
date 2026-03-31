@@ -1,10 +1,17 @@
-import { servicePosts } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchServicePosts, DbServicePost } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Calendar, User, Image, Sparkles } from 'lucide-react';
 
 export function ServiceShowcase() {
-  const approvedPosts = servicePosts.filter((p) => p.status === 'approved');
+  const [posts, setPosts] = useState<DbServicePost[]>([]);
+
+  useEffect(() => {
+    fetchServicePosts().then(setPosts).catch(() => {});
+  }, []);
+
+  const approvedPosts = posts.filter((p) => p.status === 'approved');
 
   return (
     <section className="py-8">
@@ -52,7 +59,7 @@ export function ServiceShowcase() {
                     {post.title}
                   </CardTitle>
                   <Badge className="bg-success/10 text-success border-0 text-xs">
-                    +{post.pointsAwarded} pts
+                    +{post.points_awarded} pts
                   </Badge>
                 </div>
               </CardHeader>
@@ -61,7 +68,7 @@ export function ServiceShowcase() {
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/50">
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
-                    {post.volunteerName}
+                    {post.volunteer_name}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
