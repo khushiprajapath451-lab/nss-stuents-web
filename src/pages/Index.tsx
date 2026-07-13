@@ -1,19 +1,15 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+
+
 import { Button } from '@/components/ui/button';
 import { UrgentPosts } from '@/components/UrgentPosts';
 import { HomeEvents } from '@/components/HomeEvents';
 import { ServiceShowcase } from '@/components/ServiceShowcase';
-import { CollegeSelector } from '@/components/CollegeSelector';
-import { ArrowRight } from 'lucide-react';
+
+
 import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 
 export default function Index() {
-  const [collegeSelected, setCollegeSelected] = useState(false);
-
-  if (!collegeSelected) {
-    return <CollegeSelector onSelect={() => setCollegeSelected(true)} />;
-  }
+  
 
   return (
     <div className="min-h-screen">
@@ -25,22 +21,15 @@ export default function Index() {
         <div className="container relative py-24 lg:py-36 text-center">
           <div className="max-w-2xl mx-auto space-y-8 animate-fade-in">
             <div className="flex justify-center">
-              <img src={yuvasevaLogo} alt="YuvaSeva" className="h-20 w-20 rounded-2xl shadow-lg" />
+              <img src={yuvasevaLogo} alt="NSS Vardhaman" className="h-20 w-20 rounded-2xl shadow-lg" />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display text-white leading-tight">
-              YuvaSeva
+              NSS Vardhaman
             </h1>
             <p className="text-lg text-white/80 max-w-md mx-auto">
               Track your volunteer journey, participate in events, and make a difference.
             </p>
-            <div className="pt-4">
-              <Link to="/auth">
-                <Button size="lg" variant="secondary" className="gap-2 shadow-lg text-lg px-8 py-6">
-                  LOGIN
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
+            
           </div>
         </div>
 

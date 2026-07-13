@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, X, LogOut, User, Home, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LogOut, User, Home } from 'lucide-react';
 import yuvasevaLogo from '@/assets/yuvaseva-logo.png';
 
 interface HeaderProps {
@@ -24,8 +24,7 @@ export function Header({ user, onLogout }: HeaderProps) {
   const location = useLocation();
 
   const navLinks = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/', label: 'Home', icon: Home },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -35,9 +34,9 @@ export function Header({ user, onLogout }: HeaderProps) {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <img src={yuvasevaLogo} alt="YuvaSeva" className="h-10 w-10 rounded-xl" />
+          <img src={yuvasevaLogo} alt="NSS Vardhaman" className="h-10 w-10 rounded-xl" />
           <div className="hidden sm:block">
-            <h1 className="font-display text-lg font-bold text-foreground">YuvaSeva</h1>
+            <h1 className="font-display text-lg font-bold text-foreground">NSS Vardhaman</h1>
           </div>
         </Link>
 
