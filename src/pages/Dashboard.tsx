@@ -5,7 +5,7 @@ import { CalendarLeaders } from '@/components/CalendarLeaders';
 import { AdminPanel } from '@/components/AdminPanel';
 import { VolunteerProfile } from '@/components/VolunteerProfile';
 import { InviteVolunteers } from '@/components/InviteVolunteers';
-import { User as UserIcon, Lightbulb, Calendar, Crown, Shield, IdCard, Link2, LayoutDashboard } from 'lucide-react';
+import { Lightbulb, Calendar, Crown, Shield, IdCard, Link2, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { User } from '@/App';
 import type { DbProfile } from '@/lib/supabaseData';
