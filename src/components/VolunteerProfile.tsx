@@ -1,9 +1,15 @@
+import { useEffect, useState } from 'react';
 import { User, badgeInfo, certificates as globalCerts } from '@/lib/mockData';
+import { fetchCertificates, DbCertificate } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ErpProfileSync } from '@/components/ErpProfileSync';
+import { MyBharatTracking } from '@/components/MyBharatTracking';
+import { SocialInternship } from '@/components/SocialInternship';
+import { PreviousEvents } from '@/components/PreviousEvents';
+import { PostService } from '@/components/PostService';
 import {
   User as UserIcon, BookOpen, Clock, Calendar, Award, Trophy, GraduationCap, Hash,
 } from 'lucide-react';
