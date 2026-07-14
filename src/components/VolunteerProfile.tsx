@@ -161,6 +161,12 @@ export function VolunteerProfile({ user }: VolunteerProfileProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Moved from Dashboard */}
+      <MyBharatTracking user={user} />
+      <PreviousEvents user={user} />
+      <SocialInternship user={user} />
+      <PostService user={user} />
     </div>
   );
 }
