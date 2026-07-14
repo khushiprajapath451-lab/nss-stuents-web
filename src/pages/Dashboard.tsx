@@ -1,11 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MyRecord } from '@/components/MyRecord';
+import { DashboardOverview } from '@/components/DashboardOverview';
 import { ProposeEvent } from '@/components/ProposeEvent';
 import { CalendarLeaders } from '@/components/CalendarLeaders';
 import { AdminPanel } from '@/components/AdminPanel';
 import { VolunteerProfile } from '@/components/VolunteerProfile';
 import { InviteVolunteers } from '@/components/InviteVolunteers';
-import { User as UserIcon, Lightbulb, Calendar, Crown, Shield, IdCard, Link2 } from 'lucide-react';
+import { Lightbulb, Calendar, Crown, Shield, IdCard, Link2, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { User } from '@/App';
 import type { DbProfile } from '@/lib/supabaseData';
@@ -47,9 +47,8 @@ export default function Dashboard({ user, dbProfile }: DashboardProps) {
           <TabsList className={`grid w-full h-auto p-1 ${isHead ? 'grid-cols-3' : 'grid-cols-5'}`}>
             {!isHead && (
               <TabsTrigger value="record" className="gap-2 py-3 data-[state=active]:shadow-soft">
-                <UserIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">My Record</span>
-                <span className="sm:hidden">Record</span>
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Dashboard</span>
               </TabsTrigger>
             )}
             <TabsTrigger value="propose" className="gap-2 py-3 data-[state=active]:shadow-soft">
@@ -87,7 +86,7 @@ export default function Dashboard({ user, dbProfile }: DashboardProps) {
 
           {!isHead && (
             <TabsContent value="record" className="mt-6">
-              <MyRecord user={user} />
+              <DashboardOverview user={user} />
             </TabsContent>
           )}
           <TabsContent value="propose" className="mt-6">

@@ -1,9 +1,15 @@
+import { useEffect, useState } from 'react';
 import { User, badgeInfo, certificates as globalCerts } from '@/lib/mockData';
+import { fetchCertificates, DbCertificate } from '@/lib/supabaseData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ErpProfileSync } from '@/components/ErpProfileSync';
+import { MyBharatTracking } from '@/components/MyBharatTracking';
+import { SocialInternship } from '@/components/SocialInternship';
+import { PreviousEvents } from '@/components/PreviousEvents';
+import { PostService } from '@/components/PostService';
 import {
   User as UserIcon, BookOpen, Clock, Calendar, Award, Trophy, GraduationCap, Hash,
 } from 'lucide-react';
@@ -13,7 +19,18 @@ interface VolunteerProfileProps {
 }
 
 export function VolunteerProfile({ user }: VolunteerProfileProps) {
-  const userCerts = user.certificates ?? globalCerts;
+  const [dbCerts, setDbCerts] = useState<DbCertificate[]>([]);
+
+  useEffect(() => {
+    fetchCertificates(user.id).then(setDbCerts).catch(() => {});
+    const handler = () => fetchCertificates(user.id).then(setDbCerts).catch(() => {});
+    window.addEventListener('yuvaseva-stats-updated', handler);
+    return () => window.removeEventListener('yuvaseva-stats-updated', handler);
+  }, [user.id]);
+
+  const userCerts = dbCerts.length > 0
+    ? dbCerts.map(c => ({ id: c.id, eventName: c.event_name, date: c.date, hours: Number(c.hours), type: c.type as any }))
+    : (user.certificates ?? globalCerts);
 
   const stats = [
     { label: 'Total NSS Hours', value: user.totalHours, icon: Clock, color: 'text-primary' },
@@ -144,6 +161,12 @@ export function VolunteerProfile({ user }: VolunteerProfileProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Moved from Dashboard */}
+      <MyBharatTracking user={user} />
+      <PreviousEvents user={user} />
+      <SocialInternship user={user} />
+      <PostService user={user} />
     </div>
   );
 }
