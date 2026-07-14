@@ -19,7 +19,18 @@ interface VolunteerProfileProps {
 }
 
 export function VolunteerProfile({ user }: VolunteerProfileProps) {
-  const userCerts = user.certificates ?? globalCerts;
+  const [dbCerts, setDbCerts] = useState<DbCertificate[]>([]);
+
+  useEffect(() => {
+    fetchCertificates(user.id).then(setDbCerts).catch(() => {});
+    const handler = () => fetchCertificates(user.id).then(setDbCerts).catch(() => {});
+    window.addEventListener('yuvaseva-stats-updated', handler);
+    return () => window.removeEventListener('yuvaseva-stats-updated', handler);
+  }, [user.id]);
+
+  const userCerts = dbCerts.length > 0
+    ? dbCerts.map(c => ({ id: c.id, eventName: c.event_name, date: c.date, hours: Number(c.hours), type: c.type as any }))
+    : (user.certificates ?? globalCerts);
 
   const stats = [
     { label: 'Total NSS Hours', value: user.totalHours, icon: Clock, color: 'text-primary' },
