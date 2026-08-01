@@ -151,6 +151,13 @@ export async function updateEventProposal(id: string, updates: Partial<DbEventPr
   if (error) throw error;
 }
 
+export async function deleteEventProposal(id: string) {
+  const { error } = await supabase.from('event_proposals').delete().eq('id', id);
+  if (error) throw error;
+}
+
+
+
 // ---- Urgent Alerts ----
 export async function fetchUrgentAlerts() {
   const { data, error } = await supabase.from('urgent_alerts').select('*').order('posted_at', { ascending: false });
