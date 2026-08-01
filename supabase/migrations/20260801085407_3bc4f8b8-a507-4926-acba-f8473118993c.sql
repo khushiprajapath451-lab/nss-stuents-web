@@ -1,0 +1,1 @@
+ALTER TABLE public.service_posts ADD COLUMN IF NOT EXISTS hours_requested numeric NOT NULL DEFAULT 2;
