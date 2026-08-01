@@ -171,7 +171,7 @@ export async function fetchServicePosts() {
   return (data || []) as DbServicePost[];
 }
 
-export async function createServicePost(post: Omit<DbServicePost, 'id' | 'posted_at'>) {
+export async function createServicePost(post: Omit<DbServicePost, 'id' | 'posted_at' | 'hours_requested'> & { hours_requested?: number }) {
   const { data, error } = await supabase.from('service_posts').insert(post).select().single();
   if (error) throw error;
   return data as DbServicePost;
