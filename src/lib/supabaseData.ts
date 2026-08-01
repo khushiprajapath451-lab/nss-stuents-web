@@ -244,6 +244,12 @@ export async function fetchCertificates(userId: string) {
   return (data || []) as DbCertificate[];
 }
 
+export async function fetchAllCertificates() {
+  const { data, error } = await supabase.from('certificates').select('*');
+  if (error) throw error;
+  return (data || []) as DbCertificate[];
+}
+
 export async function createCertificate(cert: Omit<DbCertificate, 'id'>) {
   const { data, error } = await supabase.from('certificates').insert(cert).select().single();
   if (error) throw error;
@@ -256,10 +262,25 @@ export const ACTIVITY_GOAL = 180;
 export const NSS_HOURS_GOAL = 240;
 export const POINTS = {
   EVENT_PARTICIPATION: 10,
-  EVENT_ORGANIZING: 20,
-  SERVICE_POST_APPROVED: 15,
-  URGENT_VOLUNTEER: 25,
+  EVENT_ORGANIZING: 50,
+  SERVICE_POST_APPROVED: 20,
+  URGENT_VOLUNTEER: 30,
+  MYBHARAT_VERIFIED: 15,
 };
+
+// Volunteer stages (must match volunteer dashboard)
+export const VOLUNTEER_STAGES = [
+  { name: 'Starter', points: 0, icon: '🌱' },
+  { name: 'Volunteer', points: 50, icon: '🤝' },
+  { name: 'Active Volunteer', points: 150, icon: '💪' },
+  { name: 'Team Leader', points: 350, icon: '⭐' },
+  { name: 'Active Champion', points: 700, icon: '🏆' },
+];
+
+export function getVolunteerStage(points: number) {
+  return VOLUNTEER_STAGES.reduce((acc, s) => (points >= s.points ? s : acc), VOLUNTEER_STAGES[0]);
+}
+
 
 export const rewardMilestones = [
   { points: 50, name: 'Starter', icon: '🌟', description: 'Complete 5 services' },
