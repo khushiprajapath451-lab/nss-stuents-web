@@ -60,6 +60,7 @@ export interface DbServicePost {
   status: string;
   posted_at: string;
   points_awarded: number;
+  hours_requested: number;
 }
 
 export interface DbAttendanceRecord {
