@@ -49,8 +49,8 @@ export function AdminPanel() {
 
       <TabsList className="flex w-full flex-wrap h-auto gap-1 p-1">
         {tabs.map(t => (
-          <TabsTrigger key={t.value} value={t.value} className="gap-2 py-2.5 flex-1 min-w-[130px]">
-            <t.icon className="h-4 w-4" />
+          <TabsTrigger key={t.value} value={t.value} className="gap-2 py-2.5 px-3 shrink-0">
+            <t.icon className="h-4 w-4 shrink-0" />
             <span className="text-xs sm:text-sm">{t.label}</span>
           </TabsTrigger>
         ))}
