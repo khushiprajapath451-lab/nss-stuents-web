@@ -243,6 +243,7 @@ export type Database = {
         Row: {
           date: string
           description: string
+          hours_requested: number
           id: string
           photos: string[] | null
           points_awarded: number | null
@@ -255,6 +256,7 @@ export type Database = {
         Insert: {
           date: string
           description: string
+          hours_requested?: number
           id?: string
           photos?: string[] | null
           points_awarded?: number | null
@@ -267,6 +269,7 @@ export type Database = {
         Update: {
           date?: string
           description?: string
+          hours_requested?: number
           id?: string
           photos?: string[] | null
           points_awarded?: number | null

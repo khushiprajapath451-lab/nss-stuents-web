@@ -60,6 +60,7 @@ export interface DbServicePost {
   status: string;
   posted_at: string;
   points_awarded: number;
+  hours_requested: number;
 }
 
 export interface DbAttendanceRecord {
@@ -150,6 +151,13 @@ export async function updateEventProposal(id: string, updates: Partial<DbEventPr
   if (error) throw error;
 }
 
+export async function deleteEventProposal(id: string) {
+  const { error } = await supabase.from('event_proposals').delete().eq('id', id);
+  if (error) throw error;
+}
+
+
+
 // ---- Urgent Alerts ----
 export async function fetchUrgentAlerts() {
   const { data, error } = await supabase.from('urgent_alerts').select('*').order('posted_at', { ascending: false });
@@ -170,7 +178,7 @@ export async function fetchServicePosts() {
   return (data || []) as DbServicePost[];
 }
 
-export async function createServicePost(post: Omit<DbServicePost, 'id' | 'posted_at'>) {
+export async function createServicePost(post: Omit<DbServicePost, 'id' | 'posted_at' | 'hours_requested'> & { hours_requested?: number }) {
   const { data, error } = await supabase.from('service_posts').insert(post).select().single();
   if (error) throw error;
   return data as DbServicePost;
@@ -236,6 +244,12 @@ export async function fetchCertificates(userId: string) {
   return (data || []) as DbCertificate[];
 }
 
+export async function fetchAllCertificates() {
+  const { data, error } = await supabase.from('certificates').select('*');
+  if (error) throw error;
+  return (data || []) as DbCertificate[];
+}
+
 export async function createCertificate(cert: Omit<DbCertificate, 'id'>) {
   const { data, error } = await supabase.from('certificates').insert(cert).select().single();
   if (error) throw error;
@@ -248,10 +262,25 @@ export const ACTIVITY_GOAL = 180;
 export const NSS_HOURS_GOAL = 240;
 export const POINTS = {
   EVENT_PARTICIPATION: 10,
-  EVENT_ORGANIZING: 20,
-  SERVICE_POST_APPROVED: 15,
-  URGENT_VOLUNTEER: 25,
+  EVENT_ORGANIZING: 50,
+  SERVICE_POST_APPROVED: 20,
+  URGENT_VOLUNTEER: 30,
+  MYBHARAT_VERIFIED: 15,
 };
+
+// Volunteer stages (must match volunteer dashboard)
+export const VOLUNTEER_STAGES = [
+  { name: 'Starter', points: 0, icon: '🌱' },
+  { name: 'Volunteer', points: 50, icon: '🤝' },
+  { name: 'Active Volunteer', points: 150, icon: '💪' },
+  { name: 'Team Leader', points: 350, icon: '⭐' },
+  { name: 'Active Champion', points: 700, icon: '🏆' },
+];
+
+export function getVolunteerStage(points: number) {
+  return VOLUNTEER_STAGES.reduce((acc, s) => (points >= s.points ? s : acc), VOLUNTEER_STAGES[0]);
+}
+
 
 export const rewardMilestones = [
   { points: 50, name: 'Starter', icon: '🌟', description: 'Complete 5 services' },
