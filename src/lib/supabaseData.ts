@@ -124,7 +124,11 @@ export async function updateProfile(id: string, updates: Partial<DbProfile>) {
 export async function authenticateUser(rollNumber: string, password: string) {
   const credentials: Record<string, string> = {
     '24881A05AG': 'vce@ag',
-    'NSRINIVAS': 'vce@ns',
+    '24881A05Y3': 'vce@y3',
+    '24881A05AP': 'vce@ap',
+    '24881A05AE': 'vce@ae',
+    '24881A05Z4': 'vce@z4',
+    'ADMIN': 'admin123',
   };
   const upper = rollNumber.toUpperCase();
   if (credentials[upper] !== password) return null;
