@@ -72,10 +72,10 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="password"
                 type="password"
-                placeholder="6-character password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                maxLength={6}
+                maxLength={20}
                 required
               />
             </div>
