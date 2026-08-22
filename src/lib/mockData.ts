@@ -111,10 +111,10 @@ const volunteer: User = {
 
 const nssHead: User = {
   id: 'head',
-  rollNumber: 'NSRINIVAS',
-  name: 'N. Srinivas',
+  rollNumber: 'ADMIN',
+  name: 'Administrator',
   role: 'head',
-  avatar: 'NS',
+  avatar: 'AD',
   branch: 'CSE',
   section: 'A',
   totalHours: 0,
@@ -133,7 +133,11 @@ export const users: User[] = [volunteer, nssHead];
 
 const credentials: Record<string, string> = {
   '24881A05AG': 'vce@ag',
-  'NSRINIVAS': 'vce@ns',
+  '24881A05Y3': 'vce@y3',
+  '24881A05AP': 'vce@ap',
+  '24881A05AE': 'vce@ae',
+  '24881A05Z4': 'vce@z4',
+  'ADMIN': 'admin123',
 };
 
 export const ACTIVITY_GOAL = 180;

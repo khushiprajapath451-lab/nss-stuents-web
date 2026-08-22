@@ -1,0 +1,1 @@
+UPDATE public.profiles SET roll_number='ADMIN', name='Administrator', avatar='AD' WHERE id='head';

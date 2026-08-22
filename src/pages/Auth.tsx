@@ -27,7 +27,7 @@ export default function Auth({ onLogin }: AuthProps) {
       const profile = await authenticateUser(rollNumber, password);
       if (profile) {
         onLogin(profile);
-        toast.success(`Welcome, ${profile.name}!`);
+        toast.success('Welcome');
         navigate('/dashboard');
       } else {
         toast.error('Invalid roll number or password');
@@ -61,7 +61,7 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="rollNumber"
                 type="text"
-                placeholder="e.g. 24881A05AG or NSRINIVAS"
+                placeholder="e.g. 24881A05AG"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
                 required
@@ -72,10 +72,10 @@ export default function Auth({ onLogin }: AuthProps) {
               <Input
                 id="password"
                 type="password"
-                placeholder="6-character password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                maxLength={6}
+                maxLength={20}
                 required
               />
             </div>

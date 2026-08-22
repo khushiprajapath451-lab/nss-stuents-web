@@ -49,7 +49,7 @@ export default function InviteLanding({ onLogin }: InviteLandingProps) {
       if (profile) {
         if (code) recordInviteJoin(code, profile.id);
         onLogin(profile);
-        toast.success(`Welcome, ${profile.name}!`);
+        toast.success('Welcome');
         navigate('/dashboard');
       } else {
         toast.error('Invalid roll number or password');
