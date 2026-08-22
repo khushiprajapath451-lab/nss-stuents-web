@@ -198,6 +198,7 @@ export type Database = {
           section: string | null
           semester: number | null
           total_hours: number | null
+          year: number | null
         }
         Insert: {
           activities_completed?: number | null
@@ -217,6 +218,7 @@ export type Database = {
           section?: string | null
           semester?: number | null
           total_hours?: number | null
+          year?: number | null
         }
         Update: {
           activities_completed?: number | null
@@ -236,6 +238,7 @@ export type Database = {
           section?: string | null
           semester?: number | null
           total_hours?: number | null
+          year?: number | null
         }
         Relationships: []
       }
